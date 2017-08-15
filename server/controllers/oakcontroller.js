@@ -28,28 +28,11 @@ module.exports = {
       }).error(helper.handleError(response));
   },
 
-  // getOneOak: function (request, response) {
-  //   console.log('finding one oak');
-  //   var params = {};
-  //   console.log(request);
-  //   // if ( request.query ) {
-  //   //   console.log(request.query)
-  //   //   var search = request.query.split('%20');
-  //   //   params.genus = search[0];
-  //   //   params.species = search[1];
-  //   // }
-  //   db.oaks.findAll({
-  //     // where: params
-  //   }).then(function (data) {
-  //     response.status(200).json(data);
-  //   }).error(helper.handleError(response));
-  // },
-
   addOak: function (request, response) { //post a new oak record or update
     var params = request.body;
     if (params.id) {
       var id = params.id;
-      db.oaks.findOne({ where: { id: id } })
+      db.oaks.findOne({where: {id: id}})
         .then(function (record) {
           record.update(params)
             .then(function(oak) {

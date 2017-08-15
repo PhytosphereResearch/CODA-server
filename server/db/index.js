@@ -1,11 +1,17 @@
 var Sequelize = require('sequelize');
-var dotenv = require('dotenv');
 
-dotenv.load();
+// Uncomment the following two lines for local development!
+// var dotenv = require('dotenv');
+// dotenv.load();
 
-var user = process.env.MYSQL_HOST;
-var pass = process.env.MYSQL_PASS;
-var orm = new Sequelize('CODA', user, pass);
+var user = process.env.RDS_USERNAME;
+var pass = process.env.RDS_PASSWORD;
+var database = process.env.RDS_DB_NAME;
+var host = process.env.RDS_DB_HOST;
+var orm = new Sequelize(database, user, pass, {
+  host: host,
+  dialect: 'mysql'
+});
 
 var oaks = orm.define('oaks', {
   genus: Sequelize.STRING,

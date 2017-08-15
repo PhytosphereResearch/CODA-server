@@ -8,6 +8,9 @@
     "cors": "^2.8.4",
     "dotenv": "^4.0.0",
     "express": "^4.13.4",
+    "express-jwt": "^5.3.0",
+    "express-jwt-authz": "^1.0.0",
+    "jwks-rsa": "^1.2.0",
     "morgan": "^1.7.0",
     "mysql": "^2.10.2",
     "sequelize": "^3.21.0"
@@ -18,5 +21,7 @@
   },
   "author": "Frances Swiecki",
   "devDependencies": {
+    "eslint": "^4.4.1",
+    "eslint-config-hackreactor": "github:hackreactor-labs/eslint-config-hackreactor"
   }
 }

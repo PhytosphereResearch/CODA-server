@@ -5,9 +5,9 @@ module.exports = {
 
   findAll: function (request, response) {
     db.bibs.findAll({})
-    .then(function (data) {
-      response.status(200).json(data);
-    }).error(helper.handleError(response));
+      .then(function (data) {
+        response.status(200).json(data);
+      }).error(helper.handleError(response));
   },
 
   addOrUpdate: function (request, response) {

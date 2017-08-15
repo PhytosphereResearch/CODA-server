@@ -22,15 +22,15 @@ module.exports = {
             fields: ['isPrimary'],
             where: { agentId: params.agentId }
           }).then(function () {
-            var id = params.id;
-            db.synonyms.findOne({ where: { id: id } })
-              .then(function (record) {
-                record.update(params)
-                  .then(function() {
-                    response.status('201').json({ message: 'Synonym updated' });
-                  });
-              });
-          });
+          var id = params.id;
+          db.synonyms.findOne({ where: { id: id } })
+            .then(function (record) {
+              record.update(params)
+                .then(function() {
+                  response.status('201').json({ message: 'Synonym updated' });
+                });
+            });
+        });
       } else {
         var id = params.id;
         db.synonyms.findOne({ where: { id: id } })
@@ -49,12 +49,12 @@ module.exports = {
             fields: ['isPrimary'],
             where: { agentId: params.agentId }
           })
-        .then(function () {
-          db.synonyms.create(params)
-            .then(function() {
-              response.status('201').json({ message: 'Your synonym has been added' });
-            });
-        });
+          .then(function () {
+            db.synonyms.create(params)
+              .then(function() {
+                response.status('201').json({ message: 'Your synonym has been added' });
+              });
+          });
       } else {
         db.synonyms.create(params)
           .then(function() {
