@@ -44,7 +44,4 @@ module.exports = function routes(app) {
   app.route('/syn')
     .get(SynonymController.getAllSynonyms)
     .post(checkJwt, SynonymController.addSynonym);
-
-  app.route('/test')
-    .get(checkJwt, AgentController.testRoute);
 };
