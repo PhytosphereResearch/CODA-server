@@ -8,8 +8,11 @@ var BibController = require('../controllers/bibcontroller');
 var checkJwt = require('./auth');
 
 module.exports = function routes(app) {
-  app.route('/agent')
+  app.route('/agents')
     .post(AgentController.post);
+
+  app.route('/agent/fields')
+    .get(AgentController.getAgentFields);
 
   app.route('/agent/:agtId')
     .get(AgentController.findAgentRecord);

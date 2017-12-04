@@ -1,5 +1,14 @@
 var db = require('../db');
+var Sequelize = require('sequelize');
 var helper = require('./helper');
+
+const getDistinct = (colName, colAlias) => {
+  return db.agents.findAll({ attributes: [
+    [Sequelize.fn('DISTINCT', Sequelize.col(colName)), colAlias]
+  ], raw: true })
+  // .then(record => record.get({plain: true}))
+    .then(res => res.map(entry => entry[colAlias]).sort().filter(entry => entry));
+};
 
 module.exports = {
 
@@ -17,6 +26,44 @@ module.exports = {
     }).then(function (data) {
       response.status(200).json(data);
     }).error(helper.handleError(response));
+  },
+
+  getAgentFields: function(request, response) { // get all agents
+    // torder: Sequelize.STRING,
+    // family: Sequelize.STRING,
+    // mostCommon: Sequelize.BOOLEAN,
+    // biotic: Sequelize.BOOLEAN,
+    // type: Sequelize.STRING,
+    // subType: Sequelize.STRING,
+    // subSubType: Sequelize.STRING,
+    // ecology: Sequelize.STRING,
+    // commonName: Sequelize.STRING,
+    // notes: Sequelize.BLOB
+    // db.agents.findAll({
+    //   attributes: [
+    //     [Sequelize.fn('DISTINCT', Sequelize.col('torder')), 'dist_torder'],
+    //     // [Sequelize.fn('DISTINCT', Sequelize.col('family')), 'dist_family'],
+    //     // [Sequelize.fn('DISTINCT', Sequelize.col('type')), 'dist_type'],
+    //     // [Sequelize.fn('DISTINCT', Sequelize.col('subType')), 'dist_subType'],
+    //     // [Sequelize.fn('DISTINCT', Sequelize.col('subSubType')), 'dist_subSubType']
+    //   ]
+    // })
+    return Promise.all([
+      getDistinct('torder', 'dist_order'),
+      getDistinct('family', 'dist_family'),
+      getDistinct('type', 'dist_type'),
+      getDistinct('subType', 'dist_subType'),
+      getDistinct('subSubType', 'dist_subSubType')
+    ])
+      .then(function(data) {
+        let options = ['torder', 'family', 'type', 'subType', 'subSubType'];
+        let fields = {};
+        data.forEach((field, index) => {
+          let option = options[index];
+          fields[option] = field;
+        });
+        response.status(200).json(fields);
+      }).catch(helper.handleError(response));
   },
 
   post: function (request, response) {
