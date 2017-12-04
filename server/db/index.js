@@ -1,8 +1,8 @@
 var Sequelize = require('sequelize');
 
 // Uncomment the following two lines for local development!
-var dotenv = require('dotenv');
-dotenv.load();
+// var dotenv = require('dotenv');
+// dotenv.load();
 
 var user = process.env.RDS_USERNAME;
 var pass = process.env.RDS_PASSWORD;
