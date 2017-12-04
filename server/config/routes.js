@@ -8,7 +8,7 @@ var BibController = require('../controllers/bibcontroller');
 var checkJwt = require('./auth');
 
 module.exports = function routes(app) {
-  app.route('/agents')
+  app.route('/agent')
     .post(AgentController.post);
 
   app.route('/agent/fields')
