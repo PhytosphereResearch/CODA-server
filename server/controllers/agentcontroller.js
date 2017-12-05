@@ -1,5 +1,13 @@
 var db = require('../db');
+var Sequelize = require('sequelize');
 var helper = require('./helper');
+
+const getDistinct = (colName, colAlias) => {
+  return db.agents.findAll({ attributes: [
+    [Sequelize.fn('DISTINCT', Sequelize.col(colName)), colAlias]
+  ], raw: true })
+    .then(res => res.map(entry => entry[colAlias]).sort().filter(entry => entry));
+};
 
 module.exports = {
 
@@ -17,6 +25,25 @@ module.exports = {
     }).then(function (data) {
       response.status(200).json(data);
     }).error(helper.handleError(response));
+  },
+
+  getAgentFields: function(request, response) { // get all agents
+    return Promise.all([
+      getDistinct('torder', 'dist_order'),
+      getDistinct('family', 'dist_family'),
+      getDistinct('type', 'dist_type'),
+      getDistinct('subType', 'dist_subType'),
+      getDistinct('subSubType', 'dist_subSubType')
+    ])
+      .then(function(data) {
+        let options = ['torder', 'family', 'type', 'subType', 'subSubType'];
+        let fields = {};
+        data.forEach((field, index) => {
+          let option = options[index];
+          fields[option] = field;
+        });
+        response.status(200).json(fields);
+      }).catch(helper.handleError(response));
   },
 
   post: function (request, response) {

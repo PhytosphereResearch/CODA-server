@@ -11,6 +11,9 @@ module.exports = function routes(app) {
   app.route('/agent')
     .post(AgentController.post);
 
+  app.route('/agent/fields')
+    .get(AgentController.getAgentFields);
+
   app.route('/agent/:agtId')
     .get(AgentController.findAgentRecord);
 
