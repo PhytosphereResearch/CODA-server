@@ -27,6 +27,9 @@ module.exports = function routes(app) {
   app.route('/interactionQuery')
     .get(InteractionController.searchForInteraction);
 
+  app.route('/hi')
+    .get(InteractionController.searchByOakAndAgentId);
+
   app.route('/hi/:hiId')
     .get(InteractionController.getOne);
 

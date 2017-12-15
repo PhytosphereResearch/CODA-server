@@ -47,6 +47,30 @@ module.exports = {
         // console.log(data);
         response.status(200).json(data);
       }).error(helper.handleError(response));
+  },
+
+  searchByOakAndAgentId: function (request, response) {
+    let agentId = request.query.agentId;
+    let oakId = request.query.oakId;
+    let oakQuery = { model: db.oaks, where: { id: oakId } };
+    let agentQuery = { model: db.agents, where: { id: agentId }};
+    db.hostInteractions.findOne({
+      include: [
+        { model: db.hiSymptoms, include: [{ model: db.symptoms }] },
+        { model: db.oaks, where: { id: oakId } },
+        { model: db.agents, where: { id: agentId}, include: [
+          { model: db.synonyms },
+        ]
+          // { model: db.hostInteractions, attributes: ['id'], include: [
+          //   { model: db.countiesByRegions }]
+          // }]
+        },
+        { model: db.bibs },
+        { model: db.countiesByRegions }
+      ]
+    })
+      .then(data => response.status(200).json(data))
+      .error(helper.handleError(response));
   }
 
 };
