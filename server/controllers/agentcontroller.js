@@ -1,74 +1,78 @@
-var db = require('../db');
-var Sequelize = require('sequelize');
-var helper = require('./helper');
+const db = require('../db');
+const Sequelize = require('sequelize');
+const helper = require('./helper');
 
-const getDistinct = (colName, colAlias) => {
-  return db.agents.findAll({ attributes: [
-    [Sequelize.fn('DISTINCT', Sequelize.col(colName)), colAlias]
-  ], raw: true })
-    .then(res => res.map(entry => entry[colAlias]).sort().filter(entry => entry));
-};
+const getDistinct = (colName, colAlias) => db.agents.findAll({
+  attributes: [
+    [Sequelize.fn('DISTINCT', Sequelize.col(colName)), colAlias],
+  ],
+  raw: true,
+})
+  .then(res => res.map(entry => entry[colAlias]).sort().filter(entry => entry));
 
 module.exports = {
 
-  findAgentRecord: function(request, response) { // get one agent AND associated counties and oaks
-    var agentId = request.params.agtId;
+  findAgentRecord(request, response) { // get one agent AND associated counties and oaks
+    const agentId = request.params.agtId;
     db.agents.findOne({
       where: { id: agentId },
       include: [
         { model: db.synonyms },
-        { model: db.hostInteractions, attributes: ['id'], include: [
-          { model: db.oaks, attributes: ['id', 'genus', 'species', 'subSpecies'] },
-          { model: db.countiesByRegions }
-        ] }
-      ]
-    }).then(function (data) {
+        {
+          model: db.hostInteractions,
+          attributes: ['id'],
+          include: [
+            { model: db.oaks, attributes: ['id', 'genus', 'species', 'subSpecies'] },
+            { model: db.countiesByRegions },
+          ],
+        },
+      ],
+    }).then((data) => {
       response.status(200).json(data);
     }).error(helper.handleError(response));
   },
 
-  getAgentFields: function(request, response) { // get all agents
+  getAgentFields(request, response) { // get all agents
     return Promise.all([
       getDistinct('torder', 'dist_order'),
       getDistinct('family', 'dist_family'),
       getDistinct('type', 'dist_type'),
       getDistinct('subType', 'dist_subType'),
-      getDistinct('subSubType', 'dist_subSubType')
+      getDistinct('subSubType', 'dist_subSubType'),
     ])
-      .then(function(data) {
-        let options = ['torder', 'family', 'type', 'subType', 'subSubType'];
-        let fields = {};
+      .then((data) => {
+        const options = ['torder', 'family', 'type', 'subType', 'subSubType'];
+        const fields = {};
         data.forEach((field, index) => {
-          let option = options[index];
+          const option = options[index];
           fields[option] = field;
         });
         response.status(200).json(fields);
       }).catch(helper.handleError(response));
   },
 
-  post: function (request, response) {
-    var allParams = request.body;
+  post(request, response) {
+    const allParams = request.body;
     if (allParams.id) {
-      var id = allParams.id;
-      db.agents.findOne({ where: { id: id } })
-        .then(function (record) {
+      const { id } = allParams;
+      db.agents.findOne({ where: { id } })
+        .then((record) => {
           record.update(allParams)
-            .then(function(agt) {
+            .then((agt) => {
               response.status(201).json(agt);
             });
         });
     } else {
-      var agent = allParams.agent;
-      var synonym = allParams.synonym;
+      const { agent, synonym } = allParams;
       db.agents.create(agent)
-        .then(function (res) {
-          var agentID = res.dataValues.id;
+        .then((res) => {
+          const agentID = res.dataValues.id;
           synonym.agentId = agentID;
           db.synonyms.create(synonym)
-            .then(function (agt) {
+            .then((agt) => {
               response.status(201).json(agt);
             });
         });
     }
-  }
+  },
 };

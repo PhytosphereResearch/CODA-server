@@ -1,7 +1,7 @@
 {
   "extends": [
     "eslint:recommended",
-    "hackreactor"
+    "airbnb"
   ],
   "env": {
     "es6": true,
