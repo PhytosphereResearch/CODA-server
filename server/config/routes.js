@@ -30,6 +30,9 @@ module.exports = function routes(app) {
   app.route('/hi')
     .get(InteractionController.searchByOakAndAgentId);
 
+  app.route('/hi/symptoms')
+    .get(InteractionController.getSubSites);
+
   app.route('/hi/:hiId')
     .get(InteractionController.getOne);
 
