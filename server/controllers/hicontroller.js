@@ -1,5 +1,13 @@
 var db = require('../db');
 var helper = require('./helper');
+var Sequelize = require('sequelize');
+var uniq = require('lodash.uniq');
+const getDistinct = (colName, colAlias) => {
+  return db.hiSymptoms.findAll({ attributes: [
+    [Sequelize.fn('DISTINCT', Sequelize.col(colName)), colAlias]
+  ], raw: true })
+    .then(res => res.map(entry => entry[colAlias]).sort().filter(entry => entry));
+};
 
 module.exports = {
 
@@ -25,7 +33,6 @@ module.exports = {
   },
 
   getOne: function (request, response) {
-    // console.log('find the thing');
     var hiId = request.params.hiId;
     db.hostInteractions.findOne({
       include: [
@@ -34,9 +41,6 @@ module.exports = {
         { model: db.agents, include: [
           { model: db.synonyms },
         ]
-          // { model: db.hostInteractions, attributes: ['id'], include: [
-          //   { model: db.countiesByRegions }]
-          // }]
         },
         { model: db.bibs },
         { model: db.countiesByRegions }
@@ -44,9 +48,40 @@ module.exports = {
       where: { id: hiId }
     })
       .then(function(data) {
-        // console.log(data);
         response.status(200).json(data);
       }).error(helper.handleError(response));
-  }
+  },
 
+  getSubSites: function(request, response) {
+    getDistinct('subSite', 'dist_subSite')
+      .then(data => {
+        return data.map(string => {
+          let split = string.split(';').map(string => string.trim());
+          return split;
+        }).reduce((a, b) => a.concat(b)).sort();
+      })
+      .then(data => uniq(data))
+      .then(function(data) {
+        response.status(200).json(data);
+      });
+  },
+
+  searchByOakAndAgentId: function (request, response) {
+    let agentId = request.query.agentId;
+    let oakId = request.query.oakId;
+    db.hostInteractions.findOne({
+      include: [
+        { model: db.hiSymptoms, include: [{ model: db.symptoms }] },
+        { model: db.oaks, where: { id: oakId } },
+        { model: db.agents, where: { id: agentId}, include: [
+          { model: db.synonyms },
+        ]
+        },
+        { model: db.bibs },
+        { model: db.countiesByRegions }
+      ]
+    })
+      .then(data => response.status(200).json(data))
+      .error(helper.handleError(response));
+  }
 };

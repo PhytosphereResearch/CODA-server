@@ -23,7 +23,6 @@ module.exports = {
             });
         });
     } else {
-      console.log('posting a new symptom record');
       db.symptoms.create(symptom)
         .then(function(sympt) {
           response.status(201).json(sympt);
