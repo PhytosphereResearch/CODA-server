@@ -1,34 +1,34 @@
-var db = require('../db');
-var helper = require('./helper');
+const db = require('../db');
+const helper = require('./helper');
 
 module.exports = {
 
-  findAll: function (request, response) {
+  findAll(request, response) {
     db.bibs.findAll({})
-      .then(function (data) {
+      .then((data) => {
         response.status(200).json(data);
       }).error(helper.handleError(response));
   },
 
-  addOrUpdate: function (request, response) {
-    var newReference = request.body;
+  addOrUpdate(request, response) {
+    const newReference = request.body;
     if (newReference.id) {
-      var id = newReference.id;
+      const { id } = newReference;
       delete newReference.id;
-      db.bibs.findOne({ where: { id: id } })
-        .then(function (record) {
+      db.bibs.findOne({ where: { id } })
+        .then((record) => {
           record.update(newReference)
-            .then(function(res) {
+            .then((res) => {
               response.status(201).json(res);
             });
         });
     } else {
       // console.log('posting a new reference record');
       db.bibs.create(newReference)
-        .then(function (res) {
+        .then((res) => {
           response.status(201).json(res);
         });
     }
-  }
+  },
 
 };

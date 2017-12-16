@@ -1,19 +1,19 @@
-var Sequelize = require('sequelize');
+const Sequelize = require('sequelize');
 
 if (process.env.NODE_ENV !== 'production') {
-  var dotenv = require('dotenv');
+  const dotenv = require('dotenv'); //eslint-disable-line
   dotenv.load();
 }
-var user = process.env.RDS_USERNAME;
-var pass = process.env.RDS_PASSWORD;
-var database = process.env.RDS_DB_NAME;
-var host = process.env.RDS_DB_HOST;
-var orm = new Sequelize(database, user, pass, {
-  host: host,
-  dialect: 'mysql'
+const user = process.env.RDS_USERNAME;
+const pass = process.env.RDS_PASSWORD;
+const database = process.env.RDS_DB_NAME;
+const host = process.env.RDS_DB_HOST;
+const orm = new Sequelize(database, user, pass, {
+  host,
+  dialect: 'mysql',
 });
 
-var oaks = orm.define('oaks', {
+const oaks = orm.define('oaks', {
   genus: Sequelize.STRING,
   subGenus: Sequelize.STRING,
   species: Sequelize.STRING,
@@ -32,10 +32,10 @@ var oaks = orm.define('oaks', {
   notes: Sequelize.BLOB,
 }, {
   createdAt: false,
-  updatedAt: false
+  updatedAt: false,
 });
 
-var agents = orm.define('agents', {
+const agents = orm.define('agents', {
   torder: Sequelize.STRING,
   family: Sequelize.STRING,
   mostCommon: Sequelize.BOOLEAN,
@@ -45,40 +45,40 @@ var agents = orm.define('agents', {
   subSubType: Sequelize.STRING,
   ecology: Sequelize.STRING,
   commonName: Sequelize.STRING,
-  notes: Sequelize.BLOB
+  notes: Sequelize.BLOB,
 }, {
   createdAt: false,
-  updatedAt: false
+  updatedAt: false,
 });
 
-var synonyms = orm.define('synonyms', {
+const synonyms = orm.define('synonyms', {
   genus: Sequelize.STRING,
   species: Sequelize.STRING,
   subSpecies: Sequelize.STRING,
   authority: Sequelize.STRING,
   isPrimary: Sequelize.BOOLEAN,
-  notes: Sequelize.BLOB
+  notes: Sequelize.BLOB,
 }, {
   createdAt: false,
-  updatedAt: false
+  updatedAt: false,
 });
 
 agents.hasMany(synonyms);
 synonyms.belongsTo(agents);
 
-var bibs = orm.define('bibs', {
+const bibs = orm.define('bibs', {
   year: Sequelize.STRING,
   description: Sequelize.STRING,
   author: Sequelize.STRING,
   title: Sequelize.BLOB,
   source: Sequelize.STRING,
-  notes: Sequelize.BLOB
+  notes: Sequelize.BLOB,
 }, {
   createdAt: false,
-  updatedAt: false
+  updatedAt: false,
 });
 
-var symptoms = orm.define('symptoms', {
+const symptoms = orm.define('symptoms', {
   symptom: Sequelize.STRING,
   description: Sequelize.BLOB,
   acorn: Sequelize.BOOLEAN,
@@ -86,33 +86,33 @@ var symptoms = orm.define('symptoms', {
   flower: Sequelize.BOOLEAN,
   leaf: Sequelize.BOOLEAN,
   root: Sequelize.BOOLEAN,
-  trunk: Sequelize.BOOLEAN
+  trunk: Sequelize.BOOLEAN,
 }, {
   createdAt: false,
-  updatedAt: false
+  updatedAt: false,
 });
 
 
 // GEOGRAPHY
-var countiesByRegions = orm.define('countiesByRegion', {
+const countiesByRegions = orm.define('countiesByRegion', {
   countyCode: Sequelize.STRING(3), //eslint-disable-line
   countyName: Sequelize.STRING,
   regionId: Sequelize.INTEGER,
-  regionName: Sequelize.STRING
+  regionName: Sequelize.STRING,
 }, {
   createdAt: false,
-  updatedAt: false
+  updatedAt: false,
 });
 
-//HOST-AGENT INTERACTIONS
-var hostInteractions = orm.define('hostInteractions', {
+// HOST-AGENT INTERACTIONS
+const hostInteractions = orm.define('hostInteractions', {
   questionable: Sequelize.BOOLEAN,
   situation: Sequelize.STRING,
   hostLifeStage: Sequelize.STRING,
-  notes: Sequelize.BLOB
+  notes: Sequelize.BLOB,
 }, {
   createdAt: false,
-  updatedAt: false
+  updatedAt: false,
 });
 
 oaks.hasMany(hostInteractions);
@@ -120,32 +120,32 @@ agents.hasMany(hostInteractions);
 hostInteractions.belongsTo(oaks);
 hostInteractions.belongsTo(agents);
 
-var hiSymptoms = orm.define('hiSymptoms', {
+const hiSymptoms = orm.define('hiSymptoms', {
   plantPart: Sequelize.STRING,
   subSite: Sequelize.STRING,
   maturity: Sequelize.STRING,
   isPrimary: Sequelize.STRING,
-  isIndirect: Sequelize.BOOLEAN
+  isIndirect: Sequelize.BOOLEAN,
 }, {
   createdAt: false,
-  updatedAt: false
+  updatedAt: false,
 });
 
 // HELPER JOIN TABLE DEFINITIONS
-var hiReferences = orm.define('hiReferences', {}, {
+const hiReferences = orm.define('hiReferences', {}, {
   createdAt: false,
-  updatedAt: false
+  updatedAt: false,
 });
-var hiLocations = orm.define('hiLocations', {}, {
+const hiLocations = orm.define('hiLocations', {}, {
   createdAt: false,
-  updatedAt: false
+  updatedAt: false,
 });
-var hiSymptomHelpers = orm.define('hiSymptomHelpers', {}, {
+const hiSymptomHelpers = orm.define('hiSymptomHelpers', {}, {
   createdAt: false,
-  updatedAt: false
+  updatedAt: false,
 });
 
-//SET UP HOST INTERACTION CONNECTIONS
+// SET UP HOST INTERACTION CONNECTIONS
 hostInteractions.hasMany(hiSymptoms);
 hiSymptoms.belongsTo(hostInteractions);
 bibs.belongsToMany(hostInteractions, { through: hiReferences });
@@ -157,7 +157,7 @@ hostInteractions.belongsToMany(countiesByRegions, { through: hiLocations });
 hiSymptoms.belongsToMany(symptoms, { through: hiSymptomHelpers });
 
 
-//SYNC EVERYTHING
+// SYNC EVERYTHING
 orm.sync();
 oaks.sync();
 agents.sync();

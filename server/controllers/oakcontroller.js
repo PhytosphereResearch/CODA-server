@@ -1,49 +1,49 @@
-var db = require('../db');
-var helper = require('./helper');
+const db = require('../db');
+const helper = require('./helper');
 
 module.exports = {
 
-  getAllOaks: function (request, response) {
+  getAllOaks(request, response) {
     db.oaks.findAll({
-    }).then(function (data) {
+    }).then((data) => {
       response.status(200).json(data);
     }).error(helper.handleError(response));
   },
 
-  getOaksByAgent: function (request, response) {
-    var agentId = request.params.agentId;
+  getOaksByAgent(request, response) {
+    const agentId = request.params.agentId;
     db.oaks.findAll({
       attributes: ['id', 'genus', 'species', 'subSpecies'],
-      include: [{ model: db.hostInteractions, required: true, where: { agentId: agentId } }]
-    }).then(function (data) {
+      include: [{ model: db.hostInteractions, required: true, where: { agentId } }],
+    }).then((data) => {
       response.status(200).json(data);
     }).error(helper.handleError(response));
   },
 
-  getOakById: function (request, response) {
-    var id = request.params.id;
-    db.oaks.findOne({ where: { id: id } })
-      .then(function(oak) {
+  getOakById(request, response) {
+    const id = request.params.id;
+    db.oaks.findOne({ where: { id } })
+      .then((oak) => {
         response.status(200).json(oak);
       }).error(helper.handleError(response));
   },
 
-  addOak: function (request, response) { //post a new oak record or update
-    var params = request.body;
+  addOak(request, response) { // post a new oak record or update
+    const params = request.body;
     if (params.id) {
-      var id = params.id;
-      db.oaks.findOne({where: {id: id}})
-        .then(function (record) {
+      const id = params.id;
+      db.oaks.findOne({ where: { id } })
+        .then((record) => {
           record.update(params)
-            .then(function(oak) {
+            .then((oak) => {
               response.status(201).json(oak);
             });
         });
     } else {
       db.oaks.create(params)
-        .then(function(oak) {
+        .then((oak) => {
           response.status(201).json(oak);
         });
     }
-  }
+  },
 };

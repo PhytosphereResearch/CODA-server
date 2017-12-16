@@ -12,13 +12,13 @@ const checkJwt = jwt({
     cache: true,
     rateLimit: true,
     jwksRequestsPerMinute: 5,
-    jwksUri: process.env.JWKS_URI
+    jwksUri: process.env.JWKS_URI,
   }),
 
   // Validate the audience and the issuer.
   audience: process.env.AUDIENCE,
   issuer: process.env.ISSUER,
-  algorithms: ['RS256']
+  algorithms: ['RS256'],
 });
 
 module.exports = checkJwt;

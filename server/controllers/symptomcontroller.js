@@ -1,33 +1,33 @@
-var db = require('../db');
-var helper = require('./helper');
+const db = require('../db');
+const helper = require('./helper');
 
 module.exports = {
 
-  findAll: function (request, response) {
+  findAll(request, response) {
     db.symptoms.findAll({})
-      .then(function (data) {
+      .then((data) => {
         response.status(200).json(data);
       }).error(helper.handleError(response));
   },
 
-  addOrUpdate: function (request, response) {
-    var symptom = request.body;
+  addOrUpdate(request, response) {
+    const symptom = request.body;
     if (symptom.id) {
-      var id = symptom.id;
+      const { id } = symptom;
       delete symptom.id;
-      db.symptoms.findOne({ where: { id: id } })
-        .then(function (record) {
+      db.symptoms.findOne({ where: { id } })
+        .then((record) => {
           record.update(symptom)
-            .then(function(sympt) {
+            .then((sympt) => {
               response.status(201).json(sympt);
             });
         });
     } else {
       db.symptoms.create(symptom)
-        .then(function(sympt) {
+        .then((sympt) => {
           response.status(201).json(sympt);
         });
     }
-  }
+  },
 
 };

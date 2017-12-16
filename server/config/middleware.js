@@ -1,5 +1,5 @@
-var morgan = require('morgan');
-var bodyParser = require('body-parser');
+const morgan = require('morgan');
+const bodyParser = require('body-parser');
 
 module.exports = function middleware(app) {
   app.use(morgan('short'));

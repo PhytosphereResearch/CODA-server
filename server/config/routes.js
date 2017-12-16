@@ -1,11 +1,11 @@
-var OakController = require('../controllers/oakcontroller');
-var AgentController = require('../controllers/agentcontroller');
-var SynonymController = require('../controllers/syncontroller');
-var CountyController = require('../controllers/counties');
-var InteractionController = require('../controllers/hicontroller');
-var SymptomController = require('../controllers/symptomcontroller');
-var BibController = require('../controllers/bibcontroller');
-var checkJwt = require('./auth');
+const OakController = require('../controllers/oakcontroller');
+const AgentController = require('../controllers/agentcontroller');
+const SynonymController = require('../controllers/syncontroller');
+const CountyController = require('../controllers/counties');
+const InteractionController = require('../controllers/hicontroller');
+const SymptomController = require('../controllers/symptomcontroller');
+const BibController = require('../controllers/bibcontroller');
+const checkJwt = require('./auth');
 
 module.exports = function routes(app) {
   app.route('/agent')
