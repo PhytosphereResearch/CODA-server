@@ -21,7 +21,7 @@ module.exports = {
           {
             fields: ['isPrimary'],
             where: { agentId: params.agentId },
-          },
+          }
         ).then(() => {
           const { id } = params;
           db.synonyms.findOne({ where: { id } })
@@ -48,7 +48,7 @@ module.exports = {
         {
           fields: ['isPrimary'],
           where: { agentId: params.agentId },
-        },
+        }
       )
         .then(() => {
           db.synonyms.create(params)
