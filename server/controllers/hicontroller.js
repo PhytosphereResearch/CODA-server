@@ -3,6 +3,8 @@ const helper = require('./helper');
 const Sequelize = require('sequelize');
 const uniq = require('lodash.uniq');
 
+const { Op } = Sequelize;
+
 const getDistinct = (colName, colAlias) => db.hiSymptoms.findAll({
   attributes: [
     [Sequelize.fn('DISTINCT', Sequelize.col(colName)), colAlias],
@@ -10,6 +12,11 @@ const getDistinct = (colName, colAlias) => db.hiSymptoms.findAll({
   raw: true,
 })
   .then(res => res.map(entry => entry[colAlias]).sort().filter(entry => entry));
+
+const updateHiLocations = (hiRecord, locations) => {
+  db.countiesByRegions.findAll({ where: { countyCode: { [Op.or]: locations } } })
+    .then(counties => hiRecord.setCountiesByRegions(counties));
+};
 
 module.exports = {
 
@@ -91,5 +98,22 @@ module.exports = {
     })
       .then(data => response.status(200).json(data))
       .error(helper.handleError(response));
+  },
+
+  addOrUpdate(request, response) {
+    const allParams = request.body;
+    const hiParams = {};
+    hiParams.questionable = allParams.questionable;
+    hiParams.situation = allParams.situation.join(';');
+    hiParams.hostLifeStage = allParams.hostLifeStage.join(';');
+    hiParams.notes = allParams.notes;
+    if (allParams.id) {
+      const { id } = allParams;
+      hiParams.id = id;
+      db.hostInteractions.findOne({ where: { id } })
+        .then(record => record.update(hiParams))
+        .then(hi => updateHiLocations(hi, allParams.countiesByRegions))
+        .then(() => response.status(201).json({ message: 'Updated' }));
+    }
   },
 };
