@@ -3,6 +3,8 @@ const helper = require('./helper');
 const Sequelize = require('sequelize');
 const uniq = require('lodash.uniq');
 
+const { Op } = Sequelize;
+
 const getDistinct = (colName, colAlias) => db.hiSymptoms.findAll({
   attributes: [
     [Sequelize.fn('DISTINCT', Sequelize.col(colName)), colAlias],
@@ -10,6 +12,11 @@ const getDistinct = (colName, colAlias) => db.hiSymptoms.findAll({
   raw: true,
 })
   .then(res => res.map(entry => entry[colAlias]).sort().filter(entry => entry));
+
+const updateHiLocations = (hiRecord, locations) => {
+  db.countiesByRegions.findAll({ where: { countyCode: { [Op.or]: locations } } })
+    .then(counties => hiRecord.setCountiesByRegions(counties));
+};
 
 module.exports = {
 
@@ -104,12 +111,9 @@ module.exports = {
       const { id } = allParams;
       hiParams.id = id;
       db.hostInteractions.findOne({ where: { id } })
-        .then((record) => {
-          record.update(hiParams)
-            .then((hi) => {
-              response.status(201).json(hi);
-            });
-        });
+        .then(record => record.update(hiParams))
+        .then(hi => updateHiLocations(hi, allParams.countiesByRegions))
+        .then(() => response.status(201).json({ message: 'Updated' }));
     }
   },
 };
