@@ -28,7 +28,8 @@ module.exports = function routes(app) {
     .get(InteractionController.searchForInteraction);
 
   app.route('/hi')
-    .get(InteractionController.searchByOakAndAgentId);
+    .get(InteractionController.searchByOakAndAgentId)
+    .post(checkJwt, InteractionController.addOrUpdate);
 
   app.route('/hi/symptoms')
     .get(InteractionController.getSubSites);

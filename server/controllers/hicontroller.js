@@ -92,4 +92,24 @@ module.exports = {
       .then(data => response.status(200).json(data))
       .error(helper.handleError(response));
   },
+
+  addOrUpdate(request, response) {
+    const allParams = request.body;
+    const hiParams = {};
+    hiParams.questionable = allParams.questionable;
+    hiParams.situation = allParams.situation.join(';');
+    hiParams.hostLifeStage = allParams.hostLifeStage.join(';');
+    hiParams.notes = allParams.notes;
+    if (allParams.id) {
+      const { id } = allParams;
+      hiParams.id = id;
+      db.hostInteractions.findOne({ where: { id } })
+        .then((record) => {
+          record.update(hiParams)
+            .then((hi) => {
+              response.status(201).json(hi);
+            });
+        });
+    }
+  },
 };
