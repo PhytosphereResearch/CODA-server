@@ -18,6 +18,11 @@ const updateHiLocations = (hiRecord, locations) => {
     .then(counties => hiRecord.setCountiesByRegions(counties));
 };
 
+const updateHiReferences = (hiRecord, references) => {
+  db.bibs.findAll({ where: { id: { [Op.or]: references } } })
+    .then(bibs => hiRecord.setBibs(bibs));
+};
+
 module.exports = {
 
   searchForInteraction(request, response) {
@@ -112,7 +117,9 @@ module.exports = {
       hiParams.id = id;
       db.hostInteractions.findOne({ where: { id } })
         .then(record => record.update(hiParams))
-        .then(hi => updateHiLocations(hi, allParams.countiesByRegions))
+        .then(hi => Promise.all([
+          updateHiLocations(hi, allParams.countiesByRegions),
+          updateHiReferences(hi, allParams.bibs)]))
         .then(() => response.status(201).json({ message: 'Updated' }));
     }
   },
