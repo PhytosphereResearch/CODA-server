@@ -14,13 +14,38 @@ const getDistinct = (colName, colAlias) => db.hiSymptoms.findAll({
   .then(res => res.map(entry => entry[colAlias]).sort().filter(entry => entry));
 
 const updateHiLocations = (hiRecord, locations) => {
-  db.countiesByRegions.findAll({ where: { countyCode: { [Op.or]: locations } } })
+  if (!locations || !locations.length) {
+    return hiRecord.setCountiesByRegions([]);
+  }
+  return db.countiesByRegions.findAll({ where: { countyCode: { [Op.or]: locations } } })
     .then(counties => hiRecord.setCountiesByRegions(counties));
 };
 
 const updateHiReferences = (hiRecord, references) => {
-  db.bibs.findAll({ where: { id: { [Op.or]: references } } })
+  if (!references || !references.length) {
+    return hiRecord.setBibs([]);
+  }
+  return db.bibs.findAll({ where: { id: { [Op.or]: references } } })
     .then(bibs => hiRecord.setBibs(bibs));
+};
+
+const updateHiSymptomList = (hiSymptomRecord, symptomList) => {
+  if (!symptomList || !symptomList.length) {
+    return hiSymptomRecord.setSymptoms([]);
+  }
+  return db.symptoms.findAll({ where: { id: { [Op.or]: symptomList.map(s => s.id) } } })
+    .then(symptomRecords => hiSymptomRecord.setSymptoms(symptomRecords));
+};
+
+const updateHiSymptom = (hiSymptom) => {
+  const { symptoms } = hiSymptom;
+  delete hiSymptom.symptoms;
+  return db.hiSymptoms.findOne({ where: { id: hiSymptom.id } })
+    .then((record) => {
+      delete hiSymptom.hostInteractionId;
+      return record.update(hiSymptom)
+    })
+    .then(record => updateHiSymptomList(record, symptoms));
 };
 
 module.exports = {
@@ -38,6 +63,7 @@ module.exports = {
       db.hiSymptoms.findAll({
         include: [{
           model: db.hostInteractions,
+          required: true,
           include: [
             oakQuery,
             { model: db.agents, include: [{ model: db.synonyms, where: { isPrimary: true } }] },
@@ -112,6 +138,7 @@ module.exports = {
     hiParams.situation = allParams.situation.join(';');
     hiParams.hostLifeStage = allParams.hostLifeStage.join(';');
     hiParams.notes = allParams.notes;
+    const hiSymptomList = Object.keys(allParams.hiSymptoms).map(key => allParams.hiSymptoms[key]);
     if (allParams.id) {
       const { id } = allParams;
       hiParams.id = id;
@@ -119,7 +146,8 @@ module.exports = {
         .then(record => record.update(hiParams))
         .then(hi => Promise.all([
           updateHiLocations(hi, allParams.countiesByRegions),
-          updateHiReferences(hi, allParams.bibs)]))
+          updateHiReferences(hi, allParams.bibs),
+        ].concat(hiSymptomList.map(hiSymptom => updateHiSymptom(hiSymptom)))))
         .then(() => response.status(201).json({ message: 'Updated' }));
     }
   },
