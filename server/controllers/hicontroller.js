@@ -40,10 +40,16 @@ const updateHiSymptomList = (hiSymptomRecord, symptomList) => {
 const updateHiSymptom = (hiSymptom) => {
   const { symptoms } = hiSymptom;
   delete hiSymptom.symptoms;
-  return db.hiSymptoms.findOne({ where: { id: hiSymptom.id } })
-    .then((record) => {
-      delete hiSymptom.hostInteractionId;
-      return record.update(hiSymptom)
+  return Promise.resolve()
+    .then(() => {
+      if (hiSymptom.id) {
+        return db.hiSymptoms.findOne({ where: { id: hiSymptom.id } })
+          .then((record) => {
+            delete hiSymptom.hostInteractionId;
+            return record.update(hiSymptom);
+          });
+      }
+      return db.hiSymptoms.create(hiSymptom);
     })
     .then(record => updateHiSymptomList(record, symptoms));
 };
