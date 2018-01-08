@@ -92,6 +92,11 @@ module.exports = {
           model: db.agents,
           include: [
             { model: db.synonyms },
+            {
+              model: db.hostInteractions,
+              where: { [Op.not]: [{ id: hiId }] },
+              include: [{ model: db.countiesByRegions }],
+            },
           ],
         },
         { model: db.bibs },
