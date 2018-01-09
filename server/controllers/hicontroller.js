@@ -95,7 +95,9 @@ module.exports = {
             {
               model: db.hostInteractions,
               where: { [Op.not]: [{ id: hiId }] },
+              attributes: ['id'],
               include: [{ model: db.countiesByRegions }],
+              required: false,
             },
           ],
         },
