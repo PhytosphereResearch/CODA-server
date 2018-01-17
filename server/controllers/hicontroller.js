@@ -145,16 +145,26 @@ module.exports = {
     hiParams.hostLifeStage = allParams.hostLifeStage.join(';');
     hiParams.notes = allParams.notes;
     const hiSymptomList = Object.keys(allParams.hiSymptoms).map(key => allParams.hiSymptoms[key]);
-    if (allParams.id) {
-      const { id } = allParams;
-      hiParams.id = id;
-      db.hostInteractions.findOne({ where: { id } })
-        .then(record => record.update(hiParams))
-        .then(hi => Promise.all([
-          updateHiLocations(hi, allParams.countiesByRegions),
-          updateHiReferences(hi, allParams.bibs),
-        ].concat(hiSymptomList.map(hiSymptom => updateHiSymptom(hiSymptom)))))
-        .then(() => response.status(201).json({ message: 'Updated' }));
-    }
+    return Promise.resolve()
+      .then(() => {
+        if (allParams.id) {
+          const { id } = allParams;
+          hiParams.id = id;
+          return db.hostInteractions.findOne({ where: { id } })
+            .then(record => record.update(hiParams));
+        }
+        hiParams.oakId = allParams.oakId;
+        hiParams.agentId = allParams.agentId;
+        return db.hostInteractions.create(hiParams)
+          .then((record) => {
+            hiSymptomList.forEach(hiSymptom => hiSymptom.hostInteractionId = record.id);
+            return record;
+          });
+      })
+      .then(hi => Promise.all([
+        updateHiLocations(hi, allParams.countiesByRegions),
+        updateHiReferences(hi, allParams.bibs),
+      ].concat(hiSymptomList.map(hiSymptom => updateHiSymptom(hiSymptom)))))
+      .then(() => response.status(201).json({ message: 'Updated' }));
   },
 };
