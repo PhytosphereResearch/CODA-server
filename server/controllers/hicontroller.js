@@ -152,19 +152,19 @@ module.exports = {
           hiParams.id = id;
           return db.hostInteractions.findOne({ where: { id } })
             .then(record => record.update(hiParams));
-          }
-          hiParams.oakId = allParams.oakId;
-          hiParams.agentId = allParams.agentId;
-          return db.hostInteractions.create(hiParams)
-            .then(record => {
-              hiSymptomList.forEach(hiSymptom => hiSymptom.hostInteractionId = record.id);
-              return record;
-            })
-        })
-            .then(hi => Promise.all([
-              updateHiLocations(hi, allParams.countiesByRegions),
-              updateHiReferences(hi, allParams.bibs),
-            ].concat(hiSymptomList.map(hiSymptom => updateHiSymptom(hiSymptom)))))
-            .then(() => response.status(201).json({ message: 'Updated' }));
-        },
+        }
+        hiParams.oakId = allParams.oakId;
+        hiParams.agentId = allParams.agentId;
+        return db.hostInteractions.create(hiParams)
+          .then((record) => {
+            hiSymptomList.forEach(hiSymptom => hiSymptom.hostInteractionId = record.id);
+            return record;
+          });
+      })
+      .then(hi => Promise.all([
+        updateHiLocations(hi, allParams.countiesByRegions),
+        updateHiReferences(hi, allParams.bibs),
+      ].concat(hiSymptomList.map(hiSymptom => updateHiSymptom(hiSymptom)))))
+      .then(() => response.status(201).json({ message: 'Updated' }));
+  },
 };
