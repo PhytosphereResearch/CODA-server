@@ -53,6 +53,27 @@ const updateHiSymptom = (hiSymptom) => {
     })
     .then(record => updateHiSymptomList(record, symptoms));
 };
+// group ids of symptoms within a general category together for querying
+const multiSymptomIds = {
+  gall: ['32', '21', '37'],
+  rot: ['57', '9', '11', '51', '76'],
+  canker: ['10', '11', '48', '72'],
+};
+
+const buildSymptomQuery = (symptomId) => {
+  // if a symptom id represents one of our general categories,
+  // we include every symptom in the category in our query
+  if (!symptomId) {
+    return { model: db.symptoms, required: true };
+  } else if (symptomId === '32') {
+    return { model: db.symptoms, required: true, where: { id: { [Op.or]: multiSymptomIds.gall } } }
+  } else if (symptomId === '57') {
+    return { model: db.symptoms, required: true, where: { id: { [Op.or]: multiSymptomIds.rot } } }
+  } else if (symptomId === '10') {
+    return { model: db.symptoms, required: true, where: { id: { [Op.or]: multiSymptomIds.canker } } }
+  }
+  return { model: db.symptoms, required: true, where: { id: symptomId } }
+};
 
 module.exports = {
 
@@ -61,9 +82,7 @@ module.exports = {
     // establish Oak include with or without query
     const oakQuery = oakId ? { model: db.oaks, where: { id: oakId } } : { model: db.oaks };
     // establish Symptoms include with or without query
-    const symptomQuery = symptomId ?
-      { model: db.symptoms, required: true, where: { id: symptomId } } :
-      { model: db.symptoms, required: true };
+    const symptomQuery = buildSymptomQuery(symptomId);
     const plantPartQuery = plantPart ? { plantPart } : {};
     if (symptomId || oakId) {
       db.hiSymptoms.findAll({

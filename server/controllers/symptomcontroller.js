@@ -1,5 +1,6 @@
 const db = require('../db');
 const helper = require('./helper');
+const Sequelize = require('sequelize');
 
 module.exports = {
 
@@ -29,5 +30,4 @@ module.exports = {
         });
     }
   },
-
 };
