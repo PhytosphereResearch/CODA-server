@@ -6,10 +6,12 @@ if (process.env.NODE_ENV !== 'production') {
 
 
 }
+
 const user = process.env.RDS_USERNAME;
 const pass = process.env.RDS_PASSWORD;
 const database = process.env.RDS_DB_NAME;
 const host = process.env.RDS_DB_HOST;
+
 const orm = new Sequelize(database, user, pass, {
   host,
   dialect: 'mysql',
