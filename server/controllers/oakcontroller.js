@@ -48,13 +48,13 @@ module.exports = {
           record.update(params)
             .then((oak) => {
               response.status(201).json(oak);
-            });
-        });
+            })
+        })
     } else {
       db.oaks.create(params)
         .then((oak) => {
           response.status(201).json(oak);
-        });
+        })
     }
   },
 };

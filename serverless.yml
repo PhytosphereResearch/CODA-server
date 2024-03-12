@@ -1,0 +1,26 @@
+	
+service: express-app
+ 
+provider:
+  name: aws
+  runtime: nodejs18.x
+  vpc:
+    securityGroupIds:
+      - YOUR_SECURITY_GROUP_IDS
+    subnetIds:
+      - YOUR_SUBNET_IDS
+  stage: dev
+  region: us-east-2
+ 
+functions:
+  app:
+    handler: app.handler
+    events:
+      - http: 
+          path: /oaks
+          method: any
+          cors: true
+      - http: 
+          path: /{proxy+}
+          method: any
+          cors: true

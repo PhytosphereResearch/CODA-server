@@ -1,7 +1,8 @@
+const serverless = require('serverless-http');
 var http = require('http');
 var express = require('express');
-var routes = require('./config/routes'); //new routes
-var middleware = require('./config/middleware.js');
+var routes = require('./server/config/routes.js'); //new routes
+var middleware = require('./server/config/middleware.js');
 var cors = require('cors');
 
 var app = express();
@@ -19,3 +20,4 @@ server.listen(app.get('port'), function () {
 });
 
 module.exports.app = app;
+module.exports.handler = serverless(app);
