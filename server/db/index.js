@@ -29,6 +29,7 @@ const oaks = orm.define('oaks', {
   distribution: Sequelize.STRING(1000), //eslint-disable-line
   hybrids: Sequelize.STRING,
   varieties: Sequelize.STRING,
+  usdaCode: Sequelize.STRING,
   notes: Sequelize.BLOB,
 }, {
   createdAt: false,
