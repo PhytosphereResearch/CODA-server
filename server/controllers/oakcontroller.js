@@ -22,7 +22,8 @@ module.exports = {
 
   getOakById(request, response) {
     const id = request.params.id;
-    db.oaks.findOne({ where: { id } })
+    console.log("testing", id);
+    db.oaks.findOne({ where: { id }, logging:console.log })
       .then((oak) => {
         response.status(200).json(oak);
       }).error(helper.handleError(response));
