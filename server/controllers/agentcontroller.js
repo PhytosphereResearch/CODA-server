@@ -12,9 +12,9 @@ const getDistinct = (colName, colAlias) => db.agents.findAll({
 
 module.exports = {
 
-  findAgentRecord(request, response) { // get one agent AND associated counties and oaks
+  async findAgentRecord(request, response) { // get one agent AND associated counties and oaks
     const agentId = request.params.agtId;
-    db.agents.findOne({
+    const data = await db.agents.findOne({
       where: { id: agentId },
       include: [
         { model: db.synonyms },
@@ -27,9 +27,10 @@ module.exports = {
           ],
         },
       ],
-    }).then((data) => {
+  });
+    // }).then((data) => {
       response.status(200).json(data);
-    }).error(helper.handleError(response));
+    // }).error(helper.handleError(response));
   },
 
   getAgentFields(request, response) { // get all agents
