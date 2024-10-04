@@ -33,7 +33,7 @@ module.exports = {
     // }).error(helper.handleError(response));
   },
 
-  getAgentFields(request, response) { // get all agents
+  async getAgentFields(request, response) { // get all agents
     return Promise.all([
       getDistinct('torder', 'dist_order'),
       getDistinct('family', 'dist_family'),

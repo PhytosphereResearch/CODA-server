@@ -95,7 +95,7 @@ module.exports = {
           ],
         }, symptomQuery],
         where: plantPartQuery,
-      }) //.then((data) => {
+      }); //.then((data) => {
         response.status(200).json(data);
       // }).error(helper.handleError(response));
     }
@@ -135,9 +135,9 @@ module.exports = {
       });
   },
 
-  searchByOakAndAgentId(request, response) {
+  async searchByOakAndAgentId(request, response) {
     const { agentId, oakId } = request.query;
-    db.hostInteractions.findOne({
+    const data = await db.hostInteractions.findOne({
       include: [
         { model: db.hiSymptoms, include: [{ model: db.symptoms }] },
         { model: db.oaks, where: { id: oakId } },
@@ -153,10 +153,10 @@ module.exports = {
       ],
     })
       .then(data => response.status(200).json(data))
-      .error(helper.handleError(response));
+      // .error(helper.handleError(response));
   },
 
-  addOrUpdate(request, response) {
+  async addOrUpdate(request, response) {
     const allParams = request.body;
     const hiParams = {};
     hiParams.questionable = allParams.questionable;
