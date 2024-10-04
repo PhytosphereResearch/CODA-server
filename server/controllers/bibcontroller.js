@@ -3,11 +3,11 @@ const helper = require('./helper');
 
 module.exports = {
 
-  findAll(request, response) {
-    db.bibs.findAll({})
-      .then((data) => {
+  async findAll(request, response) {
+    const data = await db.bibs.findAll();
+      // .then((data) => {
         response.status(200).json(data);
-      }).error(helper.handleError(response));
+      // }).error(helper.handleError(response));
   },
 
   addOrUpdate(request, response) {

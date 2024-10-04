@@ -1,8 +1,10 @@
-const Sequelize = require('sequelize');
+const {Sequelize} = require('sequelize');
 
 if (process.env.NODE_ENV !== 'production') {
   const dotenv = require('dotenv'); //eslint-disable-line
   dotenv.load();
+
+
 }
 const user = process.env.RDS_USERNAME;
 const pass = process.env.RDS_PASSWORD;
@@ -11,7 +13,15 @@ const host = process.env.RDS_DB_HOST;
 const orm = new Sequelize(database, user, pass, {
   host,
   dialect: 'mysql',
-});
+  port:3306
+  });
+ 
+// try {
+//   await orm.authenticate();
+//   console.log('Connection has been established successfully.');
+// } catch (error) {
+//   console.error('Unable to connect to the database:', error);
+// }
 
 const oaks = orm.define('oaks', {
   genus: Sequelize.STRING,

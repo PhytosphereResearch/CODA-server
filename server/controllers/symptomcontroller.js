@@ -3,12 +3,19 @@ const helper = require('./helper');
 
 module.exports = {
 
-  findAll(request, response) {
-    db.symptoms.findAll({})
-      .then((data) => {
+
+  async findAll(request, response) {
+  const data = await db.symptoms.findAll();
+  //   db.symptoms.findAll({})
+  //     .then((data) => {
         response.status(200).json(data);
-      }).error(helper.handleError(response));
+     
+      // .error(helper.handleError(response));
   },
+// db.findAll({
+// attributes: [symptoms],
+// });
+
 
   addOrUpdate(request, response) {
     const symptom = request.body;

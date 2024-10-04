@@ -77,7 +77,7 @@ const buildSymptomQuery = (symptomId) => {
 
 module.exports = {
 
-  searchForInteraction(request, response) {
+ async searchForInteraction(request, response) {
     const { plantPart, symptomId, oakId } = request.query;
     // establish Oak include with or without query
     const oakQuery = oakId ? { model: db.oaks, where: { id: oakId } } : { model: db.oaks };
@@ -85,7 +85,7 @@ module.exports = {
     const symptomQuery = buildSymptomQuery(symptomId);
     const plantPartQuery = plantPart ? { plantPart } : {};
     if (symptomId || oakId) {
-      db.hiSymptoms.findAll({
+  const data= await  db.hiSymptoms.findAll({
         include: [{
           model: db.hostInteractions,
           required: true,
@@ -95,15 +95,15 @@ module.exports = {
           ],
         }, symptomQuery],
         where: plantPartQuery,
-      }).then((data) => {
+      }); //.then((data) => {
         response.status(200).json(data);
-      }).error(helper.handleError(response));
+      // }).error(helper.handleError(response));
     }
   },
 
-  getOne(request, response) {
+  async getOne(request, response) {
     const { hiId } = request.params;
-    db.hostInteractions.findOne({
+    const data = await db.hostInteractions.findOne({
       include: [
         { model: db.hiSymptoms, include: [{ model: db.symptoms }] },
         { model: db.oaks },
@@ -117,10 +117,10 @@ module.exports = {
         { model: db.countiesByRegions },
       ],
       where: { id: hiId },
-    })
-      .then((data) => {
+    });
+      // .then((data) => {
         response.status(200).json(data);
-      }).error(helper.handleError(response));
+      // }).error(helper.handleError(response));
   },
 
   getSubSites(request, response) {
@@ -135,9 +135,9 @@ module.exports = {
       });
   },
 
-  searchByOakAndAgentId(request, response) {
+  async searchByOakAndAgentId(request, response) {
     const { agentId, oakId } = request.query;
-    db.hostInteractions.findOne({
+    const data = await db.hostInteractions.findOne({
       include: [
         { model: db.hiSymptoms, include: [{ model: db.symptoms }] },
         { model: db.oaks, where: { id: oakId } },
@@ -153,10 +153,10 @@ module.exports = {
       ],
     })
       .then(data => response.status(200).json(data))
-      .error(helper.handleError(response));
+      // .error(helper.handleError(response));
   },
 
-  addOrUpdate(request, response) {
+  async addOrUpdate(request, response) {
     const allParams = request.body;
     const hiParams = {};
     hiParams.questionable = allParams.questionable;

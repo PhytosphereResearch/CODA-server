@@ -3,13 +3,13 @@ const helper = require('./helper');
 
 module.exports = {
 
-  getCountiesByAgent(request, response) {
+  async getCountiesByAgent(request, response) {
     const { agentId } = request.params;
-    db.countiesByRegions.findAll({
+    const data = await db.countiesByRegions.findAll({
       include: [{ model: db.hostInteractions, required: true, where: { agentId } }],
-    }).then((data) => {
+    })//.then((data) => {
       response.status(200).json(data);
-    }).error(helper.handleError(response));
+    // }).error(helper.handleError(response));
   },
 
 };

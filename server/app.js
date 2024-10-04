@@ -9,7 +9,6 @@ var app = express();
 app.set('port', process.env.PORT || 3000);
 app.use(cors());
 
-
 middleware(app, express);
 routes(app, express); //new routes
 
