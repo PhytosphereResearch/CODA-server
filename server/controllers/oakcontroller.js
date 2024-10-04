@@ -11,14 +11,14 @@ module.exports = {
     // }).error(helper.handleError(response));
   },
 
-  getOaksByAgent(request, response) {
+  async getOaksByAgent(request, response) {
     const agentId = request.params.agentId;
-    db.oaks.findAll({
+    const data = await db.oaks.findAll({
       attributes: ['id', 'genus', 'species', 'subSpecies'],
       include: [{ model: db.hostInteractions, required: true, where: { agentId } }],
-    }).then((data) => {
+    })//.then((data) => {
       response.status(200).json(data);
-    }).error(helper.handleError(response));
+    // }).error(helper.handleError(response));
   },
 
  async getOakById(request, response) {
@@ -30,11 +30,11 @@ module.exports = {
       // }).error(helper.handleError(response));
   },
 
-  addOak(request, response) { // post a new oak record or update
+ async addOak(request, response) { // post a new oak record or update
     const params = request.body;
     if (params.id) {
       const id = params.id;
-      db.oaks.findOne({ where: { id } })
+      const oak= await db.oaks.findOne({ where: { id } })
         .then((record) => {
           record.update(params)
             .then((oak) => {
