@@ -76,8 +76,7 @@ const buildSymptomQuery = (symptomId) => {
 };
 
 module.exports = {
-
- async searchForInteraction(request, response) {
+  async searchForInteraction(request, response) {
     const { plantPart, symptomId, oakId } = request.query;
     // establish Oak include with or without query
     const oakQuery = oakId ? { model: db.oaks, where: { id: oakId } } : { model: db.oaks };
@@ -85,42 +84,49 @@ module.exports = {
     const symptomQuery = buildSymptomQuery(symptomId);
     const plantPartQuery = plantPart ? { plantPart } : {};
     if (symptomId || oakId) {
-  const data= await  db.hiSymptoms.findAll({
-        include: [{
-          model: db.hostInteractions,
-          required: true,
-          include: [
-            oakQuery,
-            { model: db.agents, include: [{ model: db.synonyms, where: { isPrimary: true } }] },
-          ],
-        }, symptomQuery],
-        where: plantPartQuery,
-      }); //.then((data) => {
+      try {
+        const data = await db.hiSymptoms.findAll({
+          include: [{
+            model: db.hostInteractions,
+            required: true,
+            include: [
+              oakQuery,
+              { model: db.agents, include: [{ model: db.synonyms, where: { isPrimary: true } }] },
+            ],
+          }, symptomQuery],
+          where: plantPartQuery,
+        });
         response.status(200).json(data);
-      // }).error(helper.handleError(response));
+      }
+      catch (err) {
+        helper.handleError(response)(err);
+      }
     }
   },
 
   async getOne(request, response) {
     const { hiId } = request.params;
-    const data = await db.hostInteractions.findOne({
-      include: [
-        { model: db.hiSymptoms, include: [{ model: db.symptoms }] },
-        { model: db.oaks },
-        {
-          model: db.agents,
-          include: [
-            { model: db.synonyms },
-          ],
-        },
-        { model: db.bibs },
-        { model: db.countiesByRegions },
-      ],
-      where: { id: hiId },
-    });
-      // .then((data) => {
-        response.status(200).json(data);
-      // }).error(helper.handleError(response));
+    try {
+      const data = await db.hostInteractions.findOne({
+        include: [
+          { model: db.hiSymptoms, include: [{ model: db.symptoms }] },
+          { model: db.oaks },
+          {
+            model: db.agents,
+            include: [
+              { model: db.synonyms },
+            ],
+          },
+          { model: db.bibs },
+          { model: db.countiesByRegions },
+        ],
+        where: { id: hiId },
+      });
+      response.status(200).json(data);
+    }
+    catch (err) {
+      helper.handleError(response)(err);
+    }
   },
 
   getSubSites(request, response) {
@@ -137,23 +143,27 @@ module.exports = {
 
   async searchByOakAndAgentId(request, response) {
     const { agentId, oakId } = request.query;
-    const data = await db.hostInteractions.findOne({
-      include: [
-        { model: db.hiSymptoms, include: [{ model: db.symptoms }] },
-        { model: db.oaks, where: { id: oakId } },
-        {
-          model: db.agents,
-          where: { id: agentId },
-          include: [
-            { model: db.synonyms },
-          ],
-        },
-        { model: db.bibs },
-        { model: db.countiesByRegions },
-      ],
-    })
-      .then(data => response.status(200).json(data))
-      // .error(helper.handleError(response));
+    try {
+      const data = await db.hostInteractions.findOne({
+        include: [
+          { model: db.hiSymptoms, include: [{ model: db.symptoms }] },
+          { model: db.oaks, where: { id: oakId } },
+          {
+            model: db.agents,
+            where: { id: agentId },
+            include: [
+              { model: db.synonyms },
+            ],
+          },
+          { model: db.bibs },
+          { model: db.countiesByRegions },
+        ],
+      })
+        .then(data => response.status(200).json(data))
+    }
+    catch (err) {
+      helper.handleError(response)(err);
+    }
   },
 
   async addOrUpdate(request, response) {
