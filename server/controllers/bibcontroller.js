@@ -4,10 +4,13 @@ const helper = require('./helper');
 module.exports = {
 
   async findAll(request, response) {
-    const data = await db.bibs.findAll();
-      // .then((data) => {
-        response.status(200).json(data);
-      // }).error(helper.handleError(response));
+    try {
+      const data = await db.bibs.findAll();
+      response.status(200).json(data);
+    }
+    catch (err) {
+      helper.handleError(response)(err);
+    }
   },
 
   addOrUpdate(request, response) {

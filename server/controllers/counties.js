@@ -5,11 +5,14 @@ module.exports = {
 
   async getCountiesByAgent(request, response) {
     const { agentId } = request.params;
-    const data = await db.countiesByRegions.findAll({
-      include: [{ model: db.hostInteractions, required: true, where: { agentId } }],
-    })//.then((data) => {
+    try {
+      const data = await db.countiesByRegions.findAll({
+        include: [{ model: db.hostInteractions, required: true, where: { agentId } }],
+      })
       response.status(200).json(data);
-    // }).error(helper.handleError(response));
+    }
+    catch (err) {
+      helper.handleError(response)(err);
+    }
   },
-
 };
