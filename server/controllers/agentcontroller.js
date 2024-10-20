@@ -12,27 +12,31 @@ const getDistinct = (colName, colAlias) => db.agents.findAll({
 
 module.exports = {
 
-  findAgentRecord(request, response) { // get one agent AND associated counties and oaks
+  async findAgentRecord(request, response) { // get one agent AND associated counties and oaks
     const agentId = request.params.agtId;
-    db.agents.findOne({
-      where: { id: agentId },
-      include: [
-        { model: db.synonyms },
-        {
-          model: db.hostInteractions,
-          attributes: ['id'],
-          include: [
-            { model: db.oaks, attributes: ['id', 'genus', 'species', 'subSpecies'] },
-            { model: db.countiesByRegions },
-          ],
-        },
-      ],
-    }).then((data) => {
-      response.status(200).json(data);
-    }).error(helper.handleError(response));
+    try {
+      const data = await db.agents.findOne({
+        where: { id: agentId },
+        include: [
+          { model: db.synonyms },
+          {
+            model: db.hostInteractions,
+            attributes: ['id'],
+            include: [
+              { model: db.oaks, attributes: ['id', 'genus', 'species', 'subSpecies'] },
+              { model: db.countiesByRegions },
+            ],
+          },
+        ],
+      })
+          response.status(200).json(data);
+    }
+    catch (err) {
+      helper.handleError(response)(err);
+    }
   },
 
-  getAgentFields(request, response) { // get all agents
+  async getAgentFields(request, response) { // get all agents
     return Promise.all([
       getDistinct('torder', 'dist_order'),
       getDistinct('family', 'dist_family'),

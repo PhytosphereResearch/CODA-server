@@ -3,36 +3,47 @@ const helper = require('./helper');
 
 module.exports = {
 
-  getAllOaks(request, response) {
-    db.oaks.findAll({
-    }).then((data) => {
+  async getAllOaks(request, response) {
+    try {
+      const data = await db.oaks.findAll();
       response.status(200).json(data);
-    }).error(helper.handleError(response));
+    }
+    catch (err) {
+      helper.handleError(response)(err);
+    }
   },
 
-  getOaksByAgent(request, response) {
+  async getOaksByAgent(request, response) {
     const agentId = request.params.agentId;
-    db.oaks.findAll({
-      attributes: ['id', 'genus', 'species', 'subSpecies'],
-      include: [{ model: db.hostInteractions, required: true, where: { agentId } }],
-    }).then((data) => {
+    try {
+      const data = await db.oaks.findAll({
+        attributes: ['id', 'genus', 'species', 'subSpecies'],
+        include: [{ model: db.hostInteractions, required: true, where: { agentId } }]
+      })
       response.status(200).json(data);
-    }).error(helper.handleError(response));
+    }
+    catch (err) {
+      helper.handleError(response)(err);
+    }
   },
 
-  getOakById(request, response) {
+  async getOakById(request, response) {
     const id = request.params.id;
-    db.oaks.findOne({ where: { id } })
-      .then((oak) => {
-        response.status(200).json(oak);
-      }).error(helper.handleError(response));
+    console.log("testing", id);
+    try {
+      const oak = await db.oaks.findOne({ where: { id }, logging: console.log })
+      response.status(200).json(oak);
+    }
+    catch (err) {
+      helper.handleError(response)(err);
+    }
   },
 
-  addOak(request, response) { // post a new oak record or update
+  async addOak(request, response) { // post a new oak record or update
     const params = request.body;
     if (params.id) {
       const id = params.id;
-      db.oaks.findOne({ where: { id } })
+      const oak = await db.oaks.findOne({ where: { id } })
         .then((record) => {
           record.update(params)
             .then((oak) => {

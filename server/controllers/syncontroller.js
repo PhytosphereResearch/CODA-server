@@ -1,15 +1,21 @@
 const db = require('../db');
 const helper = require('./helper');
 
+
 module.exports = {
-  getAllSynonyms(request, response) { // retrieve synonym records
-    db.synonyms.findAll({
-      include: [{ model: db.agents, attributes: ['commonName'] }],
-    })
-      .then((data) => {
-        response.status(200).json(data);
-      }).error(helper.handleError(response));
-  },
+ async getAllSynonyms(request, response) { // retrieve synonym records
+  try{
+    const data = await db.synonyms.findAll({
+    include: { model: db.agents, 
+      attributes: ['commonName'] }
+    }
+  );
+    response.status(200).json(data);
+  }
+  catch (err) {
+    helper.handleError(response)(err);
+  }
+},
 
   // TODO: refactor this
   addSynonym(request, response) { // add a new synonym
