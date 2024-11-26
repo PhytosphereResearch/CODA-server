@@ -9,7 +9,7 @@ const { validateAccessToken } = require('./auth');
 
 module.exports = function routes(app) {
   app.route('/agent')
-    .post(AgentController.post);
+    .post(validateAccessToken, AgentController.post);
 
   app.route('/agent/fields')
     .get(AgentController.getAgentFields);
