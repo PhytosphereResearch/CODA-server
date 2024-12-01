@@ -23,3 +23,8 @@ Thumbs.db
 # Environment variables #
 #########################
 .env
+
+# Serverless artifacts #
+#########################
+.serverless/
+.serverless.yml
