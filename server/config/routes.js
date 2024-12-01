@@ -5,11 +5,11 @@ const CountyController = require('../controllers/counties');
 const InteractionController = require('../controllers/hicontroller');
 const SymptomController = require('../controllers/symptomcontroller');
 const BibController = require('../controllers/bibcontroller');
-const checkJwt = require('./auth');
+const { validateAccessToken } = require('./auth');
 
 module.exports = function routes(app) {
   app.route('/agent')
-    .post(AgentController.post);
+    .post(validateAccessToken, AgentController.post);
 
   app.route('/agent/fields')
     .get(AgentController.getAgentFields);
@@ -19,7 +19,7 @@ module.exports = function routes(app) {
 
   app.route('/bib')
     .get(BibController.findAll)
-    .post(checkJwt, BibController.addOrUpdate);
+    .post(validateAccessToken, BibController.addOrUpdate);
 
   app.route('/counties/byagent/:agentId')
     .get(CountyController.getCountiesByAgent);
@@ -29,7 +29,7 @@ module.exports = function routes(app) {
 
   app.route('/hi')
     .get(InteractionController.searchByOakAndAgentId)
-    .post(checkJwt, InteractionController.addOrUpdate);
+    .post(validateAccessToken, InteractionController.addOrUpdate);
 
   app.route('/hi/symptoms')
     .get(InteractionController.getSubSites);
@@ -39,7 +39,7 @@ module.exports = function routes(app) {
 
   app.route('/oaks')
     .get(OakController.getAllOaks)
-    .post(checkJwt, OakController.addOak);
+    .post(validateAccessToken, OakController.addOak);
 
   app.route('/oaks/hostfor/:agentId')
     .get(OakController.getOaksByAgent);
@@ -49,9 +49,9 @@ module.exports = function routes(app) {
 
   app.route('/symptoms')
     .get(SymptomController.findAll)
-    .post(checkJwt, SymptomController.addOrUpdate);
+    .post(validateAccessToken, SymptomController.addOrUpdate);
 
   app.route('/syn')
     .get(SynonymController.getAllSynonyms)
-    .post(checkJwt, SynonymController.addSynonym);
+    .post(validateAccessToken, SynonymController.addSynonym);
 };

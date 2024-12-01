@@ -14,7 +14,7 @@ routes(app, express); //new routes
 
 
 var server = http.createServer(app);
-server.listen(app.get('port'), function() {
+server.listen(app.get('port'), function () {
   console.log('Listening on port ' + app.get('port'));
 });
 
