@@ -1,14 +1,14 @@
-	
+plugins:
+ - serverless-plugin-utils
+
 service: express-app
  
 provider:
   name: aws
   runtime: nodejs18.x
   vpc:
-    securityGroupIds:
-      - YOUR_SECURITY_GROUP_IDS
-    subnetIds:
-      - YOUR_SUBNET_IDS
+    securityGroupIds: ${split(${env:SECURITY_GROUP_IDS}, ',')}
+    subnetIds: ${split(${env:SUBNET_IDS}, ',')}
   stage: dev
   region: us-east-2
  
