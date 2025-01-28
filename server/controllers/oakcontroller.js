@@ -57,7 +57,7 @@ module.exports = {
           response.status(201).json(oak);
         })
     }
-  } catch (e) {
+  } catch (err) {
     helper.handleError(response)(err);
   }
   },
