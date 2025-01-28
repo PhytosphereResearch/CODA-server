@@ -40,6 +40,7 @@ module.exports = {
   },
 
   async addOak(request, response) { // post a new oak record or update
+    try {
     const params = request.body;
     if (params.id) {
       const id = params.id;
@@ -56,5 +57,8 @@ module.exports = {
           response.status(201).json(oak);
         })
     }
+  } catch (e) {
+    helper.handleError(response)(err);
+  }
   },
 };
