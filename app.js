@@ -8,7 +8,8 @@ var cors = require('cors');
 var app = express();
 
 app.set('port', process.env.PORT || 3000);
-app.use(cors({ origin: process.env.ALLOWED_ORIGIN}));
+
+app.use(cors());
 
 middleware(app, express);
 routes(app, express); //new routes
