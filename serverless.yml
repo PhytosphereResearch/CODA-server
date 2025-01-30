@@ -17,10 +17,6 @@ functions:
     handler: app.handler
     events:
       - http: 
-          path: /oaks
-          method: any
-          cors: true
-      - http: 
           path: /{proxy+}
           method: any
           cors: true
