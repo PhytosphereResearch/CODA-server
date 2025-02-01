@@ -19,4 +19,13 @@ functions:
       - http: 
           path: /{proxy+}
           method: any
-          cors: true
+          cors: 
+            origin: 'https://coda.phytosphere.com' //if making a request using credentials, the wildcard valeu is not allow for Access-Control-Allow-Origin header
+            headers: 
+              - Content-Type
+              - X-Amz-Date
+              - Authorization
+              - X-Api-Key
+              - X-Amz-Security-Token
+              - X-Amz-User-Agent
+              allowCredentials: true
