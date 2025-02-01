@@ -9,7 +9,8 @@ var app = express();
 
 app.set('port', process.env.PORT || 3000);
 
-app.use(cors({ credentials: true, origin: ture }));
+app.use(cors({ credentials: true, origin: true }));
+
 
 middleware(app, express);
 routes(app, express); //new routes
