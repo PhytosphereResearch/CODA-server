@@ -1,4 +1,4 @@
-import { jwtVerify } from "jose";
+const { jwtVerify } = require("jose");
 
 const dotenv = require("dotenv");
 
@@ -15,7 +15,7 @@ const authenticate = ({ authorizationToken }) => {
   });
 };
 
-export const handler = async (event, context) => {
+const handler = async (event, context) => {
   try {
     await authenticate(event);
     context.succeed({ isAuthorized: true });
@@ -24,3 +24,5 @@ export const handler = async (event, context) => {
     context.fail("Unauthorized");
   }
 };
+
+module.exports = { handler };
