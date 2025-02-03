@@ -21,6 +21,6 @@ export const handler = async (event, context) => {
     context.succeed({ isAuthorized: true });
   } catch (e) {
     console.error("Error->\n", e);
-    context.succeed({ isAuthorized: false });
+    context.fail({ isAuthorized: false });
   }
 };
