@@ -12,14 +12,6 @@ const errorHandler = (error, request, response, next) => {
         return;
     }
 
-    if (error instanceof UnauthorizedError) {
-        const message = "Requires authentication";
-
-        response.status(error.status).json({ message });
-
-        return;
-    }
-
     const status = 500;
     const message = "Internal Server Error";
 
