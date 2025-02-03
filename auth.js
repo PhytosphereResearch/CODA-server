@@ -1,4 +1,4 @@
-const { jwtVerify } = require("jose");
+const { jwtVerify, createRemoteJWKSet } = require("jose");
 
 const dotenv = require("dotenv");
 
