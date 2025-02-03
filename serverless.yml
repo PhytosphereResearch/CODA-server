@@ -1,8 +1,8 @@
 plugins:
- - serverless-plugin-utils
+  - serverless-plugin-utils
 
 service: express-app
- 
+
 provider:
   name: aws
   runtime: nodejs18.x
@@ -11,12 +11,21 @@ provider:
     subnetIds: ${split(${env:SUBNET_IDS}, ',')}
   stage: dev
   region: us-east-2
- 
+
 functions:
   app:
     handler: app.handler
     events:
-      - http: 
+      - http:
           path: /{proxy+}
-          method: any
+          method: GET
           cors: true
+      - http:
+          path: /{proxy+}
+          method: POST
+          cors: true
+          authorizer:
+            name: authorizerFunc
+            type: token
+  authorizerFunc:
+    handler: auth.handler

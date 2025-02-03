@@ -9,6 +9,7 @@
     "dotenv": "^4.0.0",
     "express": "^4.17.1",
     "express-oauth2-jwt-bearer": "^1.6.0",
+    "jose": "^5.9.6",
     "lodash.uniq": "^4.5.0",
     "morgan": "^1.7.0",
     "mysql2": "^3.11.3",
