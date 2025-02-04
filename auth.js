@@ -35,7 +35,9 @@ const generatePolicy = function (principalId, effect, resource) {
 };
 
 const generateAllow = function (principalId, resource) {
-  return generatePolicy(principalId, "Allow", resource);
+  const policy = generatePolicy(principalId, "Allow", resource);
+  console.log('policy', policy);
+  return policy;
 };
 
 const handler = async (event, context, callback) => {
@@ -44,12 +46,15 @@ const handler = async (event, context, callback) => {
       { headers: { authorization: event.authorizationToken }, is: () => false },
       {},
       (err) => {
+        console.log('auth error', err);
         if (err) {
           throw err;
         }
+        const policy = generateAllow("user", `${process.env.LAMBDA_ARN}/dev/POST/`);
+        console.log('POLICY', policy);
         callback(
           null,
-          generateAllow("user", `${process.env.LAMBDA_ARN}/dev/POST/`)
+          policy
         );
       }
     );
