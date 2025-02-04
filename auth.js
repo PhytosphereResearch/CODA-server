@@ -41,7 +41,7 @@ const generateAllow = function (principalId, resource) {
 const handler = async (event, context) => {
   try {
     checkJwt(
-      { headers: { authorization: event.authorizationToken } },
+      { headers: { authorization: event.authorizationToken }, is: () => false },
       {},
       (err) => {
         if (err) {
