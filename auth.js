@@ -1,4 +1,4 @@
-const { jwtVerify, createRemoteJWKSet, jwtDecrypt } = require("jose");
+const { jwtVerify, createRemoteJWKSet, decodeJwt } = require("jose");
 
 const dotenv = require("dotenv");
 
@@ -11,7 +11,6 @@ const JWKS = createRemoteJWKSet(
 const authenticate = ({ authorizationToken }) => {
   return jwtVerify(authorizationToken, JWKS, {
     issuer: `${process.env.AUTH0_DOMAIN}/`,
-    audience: process.env.AUTH0_AUDIENCE,
   });
 };
 
