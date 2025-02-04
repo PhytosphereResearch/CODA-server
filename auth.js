@@ -1,19 +1,13 @@
-const { jwtVerify, createRemoteJWKSet, jwtDecrypt } = require("jose");
-
 const dotenv = require("dotenv");
+const { auth } = require("express-oauth2-jwt-bearer");
 
 dotenv.config();
 
-const JWKS = createRemoteJWKSet(
-  new URL(`https://${process.env.AUTH0_DOMAIN}/.well-known/jwks.json`)
-);
-
-const authenticate = ({ authorizationToken }) => {
-  return jwtVerify(authorizationToken, JWKS, {
-    issuer: `${process.env.AUTH0_DOMAIN}/`,
-    audience: process.env.AUTH0_AUDIENCE,
-  });
-};
+const checkJwt = auth({
+  issuerBaseURL: `${process.env.AUTH0_DOMAIN}`,
+  audience: process.env.AUTH0_AUDIENCE,
+  tokenSigningAlg: "RS256",
+});
 
 // Help function to generate an IAM policy
 const generatePolicy = function (principalId, effect, resource) {
@@ -46,9 +40,18 @@ const generateAllow = function (principalId, resource) {
 
 const handler = async (event, context) => {
   try {
-    await authenticate(event);
-    const { sub } = decodeJwt({ authorizationToken });
-    context.succeed(generateAllow(sub, `${process.env.LAMBDA_ARN}/dev/POST/`));
+    checkJwt(
+      { headers: { authorization: event.authorizationToken } },
+      {},
+      (err) => {
+        if (err) {
+          throw err;
+        }
+        context.succeed(
+          generateAllow("user", `${process.env.LAMBDA_ARN}/dev/POST/`)
+        );
+      }
+    );
   } catch (e) {
     console.error("Error->\n", e);
     context.fail("Unauthorized");
