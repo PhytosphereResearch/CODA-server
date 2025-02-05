@@ -43,18 +43,10 @@ const handler = async (event, context) => {
   console.log('STARTING HANDLER EXECUTION', event);
   try {
     checkJwt(
-      { headers: { Authorization: event.authorizationToken }, is: () => false },
-      {},
-      (err) => {
-        console.log('auth error', err);
-        if (err) {
-          throw err;
-        }
+      { headers: { authorization: event.authorizationToken }, is: () => false })
         const policy = generateAllow("user", `${process.env.LAMBDA_ARN}/dev/POST/`);
         console.log('POLICY', policy);
         context.succeed(policy)
-      }
-    );
   } catch (e) {
     console.error("Error->\n", e);
     context.fail("Unauthorized")
