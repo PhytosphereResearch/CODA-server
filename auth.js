@@ -40,21 +40,17 @@ const generateAllow = function (principalId, resource) {
 };
 
 const handler = async (event, context) => {
-  console.log('STARTING HANDLER EXECUTION')
+  console.log('STARTING HANDLER EXECUTION');
   try {
-    checkJwt(
-      { headers: { authorization: event.authorizationToken }, is: () => false },
-      {},
-      (err) => {
-        console.log('auth error', err);
-        if (err) {
-          throw err;
-        }
+    return checkJwt(
+      { headers: { authorization: event.authorizationToken }, is: () => false }).then(()=> {
         const policy = generateAllow("user", `${process.env.LAMBDA_ARN}/dev/POST/`);
         console.log('POLICY', policy);
-        context.succeed(policy)
-      }
-    );
+        return context.succeed(policy)
+      }).catch(err => {
+          console.log('auth error', err);
+          throw err;
+      })
   } catch (e) {
     console.error("Error->\n", e);
     context.fail("Unauthorized")
