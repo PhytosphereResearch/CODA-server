@@ -40,12 +40,11 @@ const generateAllow = function (principalId, resource) {
 };
 
 const handler = async (event, context) => {
-  console.log('STARTING HANDLER EXECUTION', event, {  issuerBaseURL: `${process.env.AUTH0_DOMAIN}`,
-  audience: process.env.AUTH0_AUDIENCE});
+  console.log('STARTING HANDLER EXECUTION', event);
   try {
     checkJwt(
-      { headers: { authorization: event.authorizationToken }, is: () => false },
-      { test: ''},
+      { headers: { Authorization: event.authorizationToken }, is: () => false },
+      {},
       (err) => {
         console.log('auth error', err);
         if (err) {
