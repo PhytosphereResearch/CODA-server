@@ -50,6 +50,7 @@ const handler = async (event, context, callback) => {
         if (err) {
           throw err;
         }
+        console.log('GENERATING POLICY');
         const policy = generateAllow("user", `${process.env.LAMBDA_ARN}/dev/POST/`);
         console.log('POLICY', policy);
         callback(null, policy);
