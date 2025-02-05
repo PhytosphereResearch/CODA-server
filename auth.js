@@ -3,36 +3,34 @@ const { auth } = require("express-oauth2-jwt-bearer");
 
 dotenv.config();
 
-const checkJwt = (req) => {
-  console.log('request', req);
-  return auth({
+const checkJwt = auth({
   issuerBaseURL: `${process.env.AUTH0_DOMAIN}`,
   audience: process.env.AUTH0_AUDIENCE,
   tokenSigningAlg: "RS256",
-})};
+});
 
 // Help function to generate an IAM policy
 const generatePolicy = function (principalId, effect, resource) {
   // Required output:
-  const authResponse = {};
-  authResponse.principalId = principalId;
+  const authResponse = {
+    principalId,
+    context: {
+      stringKey: "stringval",
+      numberKey: 123,
+      booleanKey: true,
+    }
+  };
   if (effect && resource) {
-    const policyDocument = {};
-    policyDocument.Version = "2012-10-17"; // default version
-    policyDocument.Statement = [];
-    const statementOne = {};
-    statementOne.Action = "execute-api:Invoke"; // default action
-    statementOne.Effect = effect;
-    statementOne.Resource = resource;
-    policyDocument.Statement[0] = statementOne;
+    const policyDocument = {
+      Version:"2012-10-17",
+      Statement: [{
+        Action: "execute-api:Invoke",
+        Effect: effect,
+        Resource: resource
+      }],
+    };
     authResponse.policyDocument = policyDocument;
   }
-  // Optional output with custom properties of the String, Number or Boolean type.
-  authResponse.context = {
-    stringKey: "stringval",
-    numberKey: 123,
-    booleanKey: true,
-  };
   return authResponse;
 };
 
@@ -42,11 +40,12 @@ const generateAllow = function (principalId, resource) {
 };
 
 const handler = async (event, context) => {
-  console.log('STARTING HANDLER EXECUTION', event);
+  console.log('STARTING HANDLER EXECUTION', event, {  issuerBaseURL: `${process.env.AUTH0_DOMAIN}`,
+  audience: process.env.AUTH0_AUDIENCE});
   try {
     checkJwt(
       { headers: { authorization: event.authorizationToken }, is: () => false },
-      {},
+      { test: ''},
       (err) => {
         console.log('auth error', err);
         if (err) {
