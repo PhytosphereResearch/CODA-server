@@ -133,7 +133,7 @@ module.exports = {
     getDistinct('subSite', 'dist_subSite')
       .then(data => data.map((string) => {
         const split = string.split(';').map(str => str.trim());
-        return split;
+        return split;       
       }).reduce((a, b) => a.concat(b)).sort())
       .then(data => uniq(data))
       .then((data) => {
