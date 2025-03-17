@@ -46,17 +46,14 @@ const handler = async (event, context, callback) => {
       {},
       (err) => {
         if (err) {
-          console.log('auth error', err);
           throw err;
         }
-        const policy = generateAllow("user", `${process.env.LAMBDA_ARN}/dev/POST/oaks`);
-        console.log('Returning policy', JSON.stringify(policy))
+        const policy = generateAllow("user", `${process.env.LAMBDA_ARN}/dev/POST/*`);
         callback(null, policy);
       }
     );
   } catch (e) {
     console.error("Error->\n", e);
-    console.log('Auth errorr 2', e)
     callback("Unauthorized");
   }
 };
