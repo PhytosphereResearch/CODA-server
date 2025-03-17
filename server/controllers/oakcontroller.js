@@ -29,7 +29,6 @@ module.exports = {
 
   async getOakById(request, response) {
     const id = request.params.id;
-    console.log("testing", id);
     try {
       const oak = await db.oaks.findOne({ where: { id }, logging: console.log })
       response.status(200).json(oak);
