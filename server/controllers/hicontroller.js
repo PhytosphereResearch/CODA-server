@@ -133,8 +133,8 @@ module.exports = {
     getDistinct('subSite', 'dist_subSite')
       .then(data => data.map((string) => {
         const split = string.split(';').map(str => str.trim());
-        return split;       
-      }).reduce((a, b) => a.concat(b)).sort((A, B) => A.toLowerCase().localeCompare(B.toLowerCase())))
+        return split;
+      }).reduce((a, b) => a.concat(b)).sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase())))
       .then(data => uniq(data))
       .then((data) => {
         response.status(200).json(data);
