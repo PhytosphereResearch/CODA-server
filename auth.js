@@ -50,7 +50,7 @@ const handler = async (event, context, callback) => {
           throw err;
         }
         const policy = generateAllow("user", `${process.env.LAMBDA_ARN}/dev/POST/`);
-        console.log('Returning policy', policy)
+        console.log('Returning policy', JSON.stringify(policy))
         callback(null, policy);
       }
     );
