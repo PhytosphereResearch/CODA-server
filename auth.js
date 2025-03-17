@@ -49,7 +49,7 @@ const handler = async (event, context, callback) => {
           console.log('auth error', err);
           throw err;
         }
-        const policy = generateAllow("user", `${process.env.LAMBDA_ARN}/dev/POST/*`);
+        const policy = generateAllow("user", `${process.env.LAMBDA_ARN}/dev/POST/oaks`);
         console.log('Returning policy', JSON.stringify(policy))
         callback(null, policy);
       }
