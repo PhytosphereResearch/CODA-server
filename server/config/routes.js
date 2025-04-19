@@ -53,4 +53,13 @@ module.exports = function routes(app) {
   app.route('/syn')
     .get(SynonymController.getAllSynonyms)
     .post(SynonymController.addSynonym);
+
+  app.route('/')
+    .get (async (req,res) => {
+      const token = req.auth; //get the token from the request
+      const userData = await auth0.getProfile(token); //Retrieve user profile data
+
+      res.send(userData);
+
+    });
 };
