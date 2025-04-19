@@ -2,6 +2,14 @@ const db = require('../db');
 const Sequelize = require('sequelize');
 const helper = require('./helper');
 
+// router.get('/', async (req, res) => {
+//   const token = req.auth;
+//   const userData = await auth0.getProfile(token);
+//   res.send("Got user data");
+// });
+
+
+
 const getDistinct = (colName, colAlias) => db.agents.findAll({
   attributes: [
     [Sequelize.fn('DISTINCT', Sequelize.col(colName)), colAlias],

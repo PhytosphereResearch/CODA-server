@@ -1,5 +1,10 @@
+import { jwtDecode } from 'jwt-decode';
+
 const dotenv = require("dotenv");
 const { auth } = require("express-oauth2-jwt-bearer");
+const auditManager = require('./server/controllers/trailcontroller')
+
+
 
 dotenv.config();
 
@@ -8,6 +13,8 @@ const checkJwt = auth({
   audience: process.env.AUTH0_AUDIENCE,
   tokenSigningAlg: "RS256",
 });
+
+console.log ("authjs", { auth });
 
 // Help function to generate an IAM policy
 const generatePolicy = function (principalId, effect, resource) {
@@ -50,6 +57,7 @@ const handler = async (event, context, callback) => {
         }
         const policy = generateAllow("user", `${process.env.LAMBDA_ARN}/dev/POST/*`);
         callback(null, policy);
+        console.log(({ headers, authorization: event.authorizationToken }))
       }
     );
   } catch (e) {
@@ -57,5 +65,9 @@ const handler = async (event, context, callback) => {
     callback("Unauthorized");
   }
 };
+
+console.log("server accessToken=", checkJwt);
+const decoded = jwtDecode(checkJwt);
+console.log("Server decoded=", decoded);
 
 module.exports = { handler };
