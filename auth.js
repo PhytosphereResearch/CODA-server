@@ -1,4 +1,3 @@
-import { jwtDecode } from 'jwt-decode';
 
 const dotenv = require("dotenv");
 const { auth } = require("express-oauth2-jwt-bearer");
@@ -46,8 +45,7 @@ const generateAllow = function (principalId, resource) {
   return policy;
 };
 
-const handler = async (event, context, callback) => {
-  console.log("event: \n" + event);
+const handler = async (event, context, callback) => { 
   try {
     await checkJwt(
       { headers: { authorization: event.authorizationToken }, is: () => false },
@@ -58,7 +56,6 @@ const handler = async (event, context, callback) => {
         }
         const policy = generateAllow("user", `${process.env.LAMBDA_ARN}/dev/POST/*`);
         callback(null, policy);
-        console.log(({ headers, authorization: event.authorizationToken }))
       }
     );
   } catch (e) {
@@ -66,9 +63,5 @@ const handler = async (event, context, callback) => {
     callback("Unauthorized");
   }
 };
-
-console.log("server accessToken=", checkJwt);
-const decoded = jwtDecode(checkJwt);
-console.log("Server decoded=", decoded);
 
 module.exports = { handler };
