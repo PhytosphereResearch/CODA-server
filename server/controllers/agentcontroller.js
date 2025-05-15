@@ -17,6 +17,7 @@ const getDistinct = (colName, colAlias) => db.agents.findAll({
   raw: true,
 })
   .then(res => res.map(entry => entry[colAlias]).sort().filter(entry => entry));
+ 
 
 module.exports = {
 
@@ -37,7 +38,7 @@ module.exports = {
           },
         ],
       })
-          response.status(200).json(data);
+      response.status(200).json(data);
     }
     catch (err) {
       helper.handleError(response)(err);
@@ -63,28 +64,58 @@ module.exports = {
       }).catch(helper.handleError(response));
   },
 
-  post(request, response) {
-    const allParams = request.body;
+  async post(request, response) {
+    
+    //things needed to make a record in edit_trails
+    let currentDate = new Date();
+    date=currentDate.toLocaleString();
+    // console.log(date);
+    const user_id = request.body.userName;
+    table_record_id = request.body.agent.id;
+    record = request.body.agent;
+    new_recordStr = JSON.stringify({ record });
+    console.log("new_recordStr", new_recordStr, "table_record_id", table_record_id, "user_id", user_id, "date", date, "currentDate", currentDate);
+
+    const trail = await db.edit_trails.create({ 
+      user_id: user_id,
+       table_name: 'agents', 
+       table_record_id: table_record_id, 
+       new_record: new_recordStr, 
+      date_time: currentDate
+      });
+  
+    const allParams = request.body.agent;
+    // console.log("allParams", allParams);
+    
     if (allParams.id) {
       const { id } = allParams;
-      db.agents.findOne({ where: { id } })
-        .then((record) => {
-          record.update(allParams)
-            .then((agt) => {
-              response.status(201).json(agt);
-            });
+    db.agents.findOne({ where: { id } })
+       
+    .then((record) => {
+      // console.log("record", record);
+      record.update(allParams)
+        .then((agt) => {
+          response.status(201).json(agt);
+          // console.log("agt", agt);
         });
-    } else {
-      const { agent, synonym } = allParams;
-      db.agents.create(agent)
-        .then((res) => {
-          const agentID = res.dataValues.id;
-          synonym.agentId = agentID;
-          db.synonyms.create(synonym)
-            .then((agt) => {
-              response.status(201).json(agt);
-            });
+    });
+} else {
+  const { agent, synonym } = allParams;
+
+      record = allParams;
+      new_recordStr = JSON.stringify({ record });
+      console.log("new_recordStr", new_recordStr, "table_record_id", table_record_id, "user_id", user_id, "date", date, "currentDate", currentDate);
+
+
+  db.agents.create(agent)
+    .then((res) => {
+      const agentID = res.dataValues.id;
+      synonym.agentId = agentID;
+      db.synonyms.create(synonym)
+        .then((agt) => {
+          response.status(201).json(agt);
         });
-    }
+    });
+}
   },
 };

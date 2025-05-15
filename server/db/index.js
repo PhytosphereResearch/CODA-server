@@ -25,6 +25,17 @@ const orm = new Sequelize(database, user, pass, {
 //   console.error('Unable to connect to the database:', error);
 // }
 
+const edit_trails = orm.define ('edit_trails', {
+  user_id: Sequelize.STRING,
+  table_name: Sequelize.STRING,
+  table_record_id: Sequelize.INTEGER,
+  new_record: Sequelize.STRING,
+  date_time: Sequelize.DATE,
+}, {
+  createdAt: false,
+  updatedAt: false,
+});
+
 const oaks = orm.define('oaks', {
   genus: Sequelize.STRING,
   subGenus: Sequelize.STRING,
@@ -59,6 +70,8 @@ const agents = orm.define('agents', {
   ecology: Sequelize.STRING,
   commonName: Sequelize.STRING,
   notes: Sequelize.BLOB,
+  bookLink: Sequelize.STRING,
+  original_coda_record: Sequelize.BOOLEAN,
 }, {
   createdAt: false,
   updatedAt: false,
@@ -192,3 +205,4 @@ exports.hiSymptoms = hiSymptoms;
 exports.hiSymptomHelpers = hiSymptomHelpers;
 exports.hiReferences = hiReferences;
 exports.hiLocations = hiLocations;
+exports.edit_trails = edit_trails;
