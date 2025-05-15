@@ -1,7 +1,6 @@
 
 const dotenv = require("dotenv");
 const { auth } = require("express-oauth2-jwt-bearer");
-const auditManager = require('./server/controllers/trailcontroller')
 
 
 
@@ -13,7 +12,25 @@ const checkJwt = auth({
   tokenSigningAlg: "RS256",
 });
 
-console.log ("authjs", { auth });
+const userData = async (req, res) => {
+  try {
+    const accessToken = req.headers.authorization.split(' ')[1];
+    const response = await fetch(`${process.env.AUTH0_DOMAIN}/userinfo`, {
+      headers: {
+        authorization: `Bearer ${accessToken}` 
+      },
+      method: "GET",
+      body: JSON.stringify(response),
+      mode: "CORS",
+    })
+
+const userInfo = response.data;
+console.log(userInfo);
+    response.send (req.user);
+  }  catch (err) {
+        helper.handleError(res)(err);
+     }
+  };
 
 // Help function to generate an IAM policy
 const generatePolicy = function (principalId, effect, resource) {
@@ -62,6 +79,7 @@ const handler = async (event, context, callback) => {
     console.error("Error->\n", e);
     callback("Unauthorized");
   }
-};
+
+  };
 
 module.exports = { handler };
