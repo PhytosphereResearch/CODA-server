@@ -71,20 +71,22 @@ module.exports = {
     const { userName, agent } = request.body;
     const agentId = agent.id;
 
-    const allParams = request.body.agent;
-    if (allParams.id) {
-      const { id } = allParams;
-      const trail = await db.edit_trails.create({
+    const allParams = request.body.agent;//duplicative? this is just agent-right?
+    if (allParams.id) {//if (agentId) {
+      const { id } = allParams;//what is this doing? destructuring agent? recreating agentId again?
+     
+      const trail = await db.edit_trails.create({//side code to make a record in edit trails
         user_id: userName,
         table_name: 'agents',
         table_record_id: agentId,
         new_record: JSON.stringify(agent),
         date_time: currentDate
       });
-      db.agents.findOne({ where: { id } })
+     
+      db.agents.findOne({ where: { id } })//find existing record by agentId and update is with agent?
         .then((record) => {
           record.update(allParams)
-            .then((agt) => {
+            .then((agt) => {//this is the copy of agent that gets sent to the database?
               response.status(201).json(agt);
             });
         });
