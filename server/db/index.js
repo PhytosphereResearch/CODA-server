@@ -25,7 +25,7 @@ const orm = new Sequelize(database, user, pass, {
 //   console.error('Unable to connect to the database:', error);
 // }
 
-const edit_trails = orm.define ('edit_trails', {
+const editTrails = orm.define ('edit_trails', {
   user_id: Sequelize.STRING,
   table_name: Sequelize.STRING,
   table_record_id: Sequelize.INTEGER,
@@ -205,4 +205,4 @@ exports.hiSymptoms = hiSymptoms;
 exports.hiSymptomHelpers = hiSymptomHelpers;
 exports.hiReferences = hiReferences;
 exports.hiLocations = hiLocations;
-exports.edit_trails = edit_trails;
+exports.editTrails = editTrails;

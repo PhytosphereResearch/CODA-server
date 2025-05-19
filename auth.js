@@ -1,9 +1,6 @@
 
 const dotenv = require("dotenv");
 const { auth } = require("express-oauth2-jwt-bearer");
-
-
-
 dotenv.config();
 
 const checkJwt = auth({
@@ -11,26 +8,6 @@ const checkJwt = auth({
   audience: process.env.AUTH0_AUDIENCE,
   tokenSigningAlg: "RS256",
 });
-
-const userData = async (req, res) => {
-  try {
-    const accessToken = req.headers.authorization.split(' ')[1];
-    const response = await fetch(`${process.env.AUTH0_DOMAIN}/userinfo`, {
-      headers: {
-        authorization: `Bearer ${accessToken}` 
-      },
-      method: "GET",
-      body: JSON.stringify(response),
-      mode: "CORS",
-    })
-
-const userInfo = response.data;
-console.log(userInfo);
-    response.send (req.user);
-  }  catch (err) {
-        helper.handleError(res)(err);
-     }
-  };
 
 // Help function to generate an IAM policy
 const generatePolicy = function (principalId, effect, resource) {
@@ -79,7 +56,6 @@ const handler = async (event, context, callback) => {
     console.error("Error->\n", e);
     callback("Unauthorized");
   }
-
-  };
+};
 
 module.exports = { handler };

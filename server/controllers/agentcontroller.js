@@ -2,14 +2,6 @@ const db = require('../db');
 const Sequelize = require('sequelize');
 const helper = require('./helper');
 
-// router.get('/', async (req, res) => {
-//   const token = req.auth;
-//   const userData = await auth0.getProfile(token);
-//   res.send("Got user data");
-// });
-
-
-
 const getDistinct = (colName, colAlias) => db.agents.findAll({
   attributes: [
     [Sequelize.fn('DISTINCT', Sequelize.col(colName)), colAlias],
@@ -17,7 +9,6 @@ const getDistinct = (colName, colAlias) => db.agents.findAll({
   raw: true,
 })
   .then(res => res.map(entry => entry[colAlias]).sort().filter(entry => entry));
-
 
 module.exports = {
 
@@ -66,38 +57,38 @@ module.exports = {
 
   async post(request, response) {
 
-    //things needed to make a record in edit_trails
+    //things needed to make a record in editTrails
     let currentDate = new Date();
-    const { userName, agent } = request.body;
+    const { userName, agent, synonym } = request.body;
     const agentId = agent.id;
 
-    const allParams = request.body.agent;//duplicative? this is just agent-right?
-    if (allParams.id) {//if (agentId) {
-      const { id } = allParams;//what is this doing? destructuring agent? recreating agentId again?
-     
-      const trail = await db.edit_trails.create({//side code to make a record in edit trails
+    // const allParams = request.body.agent;//duplicative? this is just agent-right?
+    if agentId//if (allParams.id) {//if (agentId) {
+      // const { id } = allParams;//what is this doing? destructuring agent? recreating agentId again?
+
+      const trail = await db.editTrails.create({//side code to make a record in edit trails
         user_id: userName,
         table_name: 'agents',
         table_record_id: agentId,
         new_record: JSON.stringify(agent),
         date_time: currentDate
       });
-     
-      db.agents.findOne({ where: { id } })//find existing record by agentId and update is with agent?
+
+      db.agents.findOne({ where: { agentId } })//find existing record by agentId and update is with agent?
         .then((record) => {
-          record.update(allParams)
-            .then((agt) => {//this is the copy of agent that gets sent to the database?
+          record.update(agent)
+            .then((agt) => {
               response.status(201).json(agt);
             });
         });
     } else {//if new agent created
-      const { agent, synonym } = allParams;
-      const newAgent = await db.agents.create(agent)
+      // const { agent, synonym } = allParams;
+      const newAgent = await db.agents.create(agent);
       const agentID = newAgent.dataValues.id;
 
       synonym.agentId = agentID;
       const agt = await db.synonyms.create(synonym)
-      await db.edit_trails.create({
+      await db.editTrails.create({
         user_id: userName,
         table_name: 'agents',
         table_record_id: agentID,
@@ -105,7 +96,7 @@ module.exports = {
         date_time: currentDate
       });
 
-      await db.edit_trails.create({
+      await db.editTrails.create({
         user_id: userName,
         table_name: 'synonyms',
         table_record_id: agt.dataValues.id,
