@@ -58,20 +58,20 @@ module.exports = {
   async post(request, response) {
 
     //things needed to make a record in editTrails
-    let currentDate = new Date();
+    // const currentDate = new Date();
     const { userName, agent, synonym } = request.body;
     const agentId = agent.id;
 
-    // const allParams = request.body.agent;//duplicative? this is just agent-right?
-    if agentId//if (allParams.id) {//if (agentId) {
-      // const { id } = allParams;//what is this doing? destructuring agent? recreating agentId again?
+    const allParams = request.body.agent;//duplicative? this is just agent-right?
+   if (allParams.id) {//if (agentId) {
+      const { id } = allParams;//what is this doing? destructuring agent? recreating agentId again?
 
       const trail = await db.editTrails.create({//side code to make a record in edit trails
         user_id: userName,
         table_name: 'agents',
         table_record_id: agentId,
         new_record: JSON.stringify(agent),
-        date_time: currentDate
+        // date_time: currentDate
       });
 
       db.agents.findOne({ where: { agentId } })//find existing record by agentId and update is with agent?
@@ -93,7 +93,7 @@ module.exports = {
         table_name: 'agents',
         table_record_id: agentID,
         new_record: JSON.stringify(agent),
-        date_time: currentDate
+        // date_time: currentDate
       });
 
       await db.editTrails.create({
@@ -101,7 +101,7 @@ module.exports = {
         table_name: 'synonyms',
         table_record_id: agt.dataValues.id,
         new_record: JSON.stringify(synonym),
-        date_time: currentDate
+        // date_time: currentDate
       });
       response.status(201).json(agt);
 
