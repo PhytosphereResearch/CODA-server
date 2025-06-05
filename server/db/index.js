@@ -25,19 +25,19 @@ const orm = new Sequelize(database, user, pass, {
 //   console.error('Unable to connect to the database:', error);
 // }
 
-const editTrails = orm.define ('edit_trails2', {
+const editTrails = orm.define ('edit_trails', {
   user_id: Sequelize.STRING,
   table_name: Sequelize.STRING,
   table_record_id: Sequelize.INTEGER,
-  user_action: Sequelize.STRING,
-  new_record: Sequelize.BLOB,//this is the record after it was created or updated
-  old_record: Sequelize.BLOB,//for existing records, this is the record before it was edited by user_id
-  // date_time: Sequelize.DATE,
+  // user_action: Sequelize.STRING,
+  new_record: Sequelize.STRING,//this is the record after it was created or updated
+  // old_record: Sequelize.STRING,//for existing records, this is the record before it was edited by user_id
+  date_time: Sequelize.DATE,
 }, {
-  // createdAt: false,
-  timestamps: true,
+  createdAt: false,
+  // timestamps: true,
   updatedAt: false,
-  createdAt: 'date_time',
+  // createdAt: 'date_time',
 });
 
 const oaks = orm.define('oaks', {
