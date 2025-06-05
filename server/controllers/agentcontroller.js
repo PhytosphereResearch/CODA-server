@@ -60,17 +60,10 @@ module.exports = {
     //things needed to make a record in editTrails
     let currentDate = new Date();
     const { userName, agent } = request.body;
-    console.log ("agent", agent);
     const { id } = agent; //this gets the agent id
     const newRecord = JSON.stringify(agent);
-    console.log("newRecord", newRecord);
-
-    // const allParams = request.body.agent;//duplicative? this is just agent-right?
-   if (agent.id) {//would this be the same as if (agentId) {
-    // console.log ("allParamsID", allParams.id);
-      // const { id } = allParams;//what is this doing? destructuring agent? recreating agentId again?
-      console.log("id",  id );
-
+   
+    if (agent.id) {
       const trail = await db.editTrails.create({//side code to make a record in edit trails
         user_id: userName,
         table_name: 'agents',
@@ -88,7 +81,6 @@ module.exports = {
         });
     } else {//if new agent created
       const { agent, synonym } = request.body.agent;//synonym is part  of agent
-      console.log("agent", agent, "synonym", synonym);
       const newAgent = await db.agents.create(agent);
       const agentID = newAgent.dataValues.id;
 
