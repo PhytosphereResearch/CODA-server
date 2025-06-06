@@ -1,4 +1,4 @@
-const {Sequelize} = require('sequelize');
+const { Sequelize } = require('sequelize');
 
 if (process.env.NODE_ENV !== 'production') {
   const dotenv = require('dotenv'); //eslint-disable-line
@@ -15,9 +15,9 @@ const host = process.env.RDS_DB_HOST;
 const orm = new Sequelize(database, user, pass, {
   host,
   dialect: 'mysql',
-  port:3306
-  });
- 
+  port: 3306
+});
+
 // try {
 //   await orm.authenticate();
 //   console.log('Connection has been established successfully.');
@@ -25,13 +25,25 @@ const orm = new Sequelize(database, user, pass, {
 //   console.error('Unable to connect to the database:', error);
 // }
 
-const editTrails = orm.define ('edit_trails', {
+// const editTrails = orm.define('edit_trails', {
+//   user_id: Sequelize.STRING,
+//   table_name: Sequelize.STRING,
+//   table_record_id: Sequelize.INTEGER,
+//   new_record: Sequelize.STRING,//this is the record after it was created or updated
+//   date_time: Sequelize.DATE,
+// }, {
+//   createdAt: false,
+//   // timestamps: true,
+//   updatedAt: false,
+//   // createdAt: 'date_time',
+// });
+
+const auditLogs = orm.define('auditlogs', {
   user_id: Sequelize.STRING,
   table_name: Sequelize.STRING,
   table_record_id: Sequelize.INTEGER,
-  // user_action: Sequelize.STRING,
+  action: Sequelize.STRING,
   new_record: Sequelize.STRING,//this is the record after it was created or updated
-  // old_record: Sequelize.STRING,//for existing records, this is the record before it was edited by user_id
   date_time: Sequelize.DATE,
 }, {
   createdAt: false,
@@ -209,4 +221,5 @@ exports.hiSymptoms = hiSymptoms;
 exports.hiSymptomHelpers = hiSymptomHelpers;
 exports.hiReferences = hiReferences;
 exports.hiLocations = hiLocations;
-exports.editTrails = editTrails;
+// exports.editTrails = editTrails;
+exports.auditLogs = auditLogs;

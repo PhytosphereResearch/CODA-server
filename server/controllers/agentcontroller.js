@@ -57,20 +57,20 @@ module.exports = {
 
   async post(request, response) {
 
-    //things needed to make a record in editTrails
+    //things needed to make a record in auditLogs
     let currentDate = new Date();
     const { userName, agent } = request.body;
     const { id } = agent; //this gets the agent id
-    const newRecord = JSON.stringify(agent);
-   
+
     if (agent.id) {
-      const trail = await db.editTrails.create({//side code to make a record in edit trails
+      const trail = await db.auditLogs.create({//side code to make a record in auditLogs
         user_id: userName,
         table_name: 'agents',
         table_record_id: id,
+        action: 'update',
         new_record: JSON.stringify(agent),
         date_time: currentDate,
-      });
+      })
 
       db.agents.findOne({ where: { id } })//find existing record by agentId and update it with agent
         .then((record) => {
@@ -86,19 +86,21 @@ module.exports = {
 
       synonym.agentId = agentID;
       const agt = await db.synonyms.create(synonym)
-     
-      await db.editTrails.create({
+
+      await db.auditLogs.create({
         user_id: userName,
         table_name: 'agents',
         table_record_id: agentID,
+        action: 'create',
         new_record: JSON.stringify(agent),
         date_time: currentDate
       });
 
-      await db.editTrails.create({
+      await db.auditLogs.create({
         user_id: userName,
         table_name: 'synonyms',
         table_record_id: agt.dataValues.id,
+        action: 'create',
         new_record: JSON.stringify(synonym),
         date_time: currentDate
       });
