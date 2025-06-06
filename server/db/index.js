@@ -25,19 +25,6 @@ const orm = new Sequelize(database, user, pass, {
 //   console.error('Unable to connect to the database:', error);
 // }
 
-// const editTrails = orm.define('edit_trails', {
-//   user_id: Sequelize.STRING,
-//   table_name: Sequelize.STRING,
-//   table_record_id: Sequelize.INTEGER,
-//   new_record: Sequelize.STRING,//this is the record after it was created or updated
-//   date_time: Sequelize.DATE,
-// }, {
-//   createdAt: false,
-//   // timestamps: true,
-//   updatedAt: false,
-//   // createdAt: 'date_time',
-// });
-
 const auditLogs = orm.define('auditlogs', {
   user_id: Sequelize.STRING,
   table_name: Sequelize.STRING,
@@ -46,10 +33,9 @@ const auditLogs = orm.define('auditlogs', {
   new_record: Sequelize.STRING,//this is the record after it was created or updated
   date_time: Sequelize.DATE,
 }, {
-  createdAt: false,
-  // timestamps: true,
+  timestamps: true,
   updatedAt: false,
-  // createdAt: 'date_time',
+  createdAt: 'date_time',
 });
 
 const oaks = orm.define('oaks', {
