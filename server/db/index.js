@@ -207,5 +207,4 @@ exports.hiSymptoms = hiSymptoms;
 exports.hiSymptomHelpers = hiSymptomHelpers;
 exports.hiReferences = hiReferences;
 exports.hiLocations = hiLocations;
-// exports.editTrails = editTrails;
 exports.auditLogs = auditLogs;
