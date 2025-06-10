@@ -30,7 +30,7 @@ const auditLogs = orm.define('auditlogs', {
   table_name: Sequelize.STRING,
   table_record_id: Sequelize.INTEGER,
   action: Sequelize.STRING,
-  new_record: Sequelize.STRING,//this is the record after it was created or updated
+  new_record: Sequelize.BLOB,//this is the record after it was created or updated
   date_time: Sequelize.DATE,
 }, {
   timestamps: true,
