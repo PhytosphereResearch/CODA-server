@@ -29,7 +29,7 @@ module.exports = {
           },
         ],
       })
-          response.status(200).json(data);
+      response.status(200).json(data);
     }
     catch (err) {
       helper.handleError(response)(err);
@@ -55,28 +55,51 @@ module.exports = {
       }).catch(helper.handleError(response));
   },
 
-  post(request, response) {
-    const allParams = request.body;
-    if (allParams.id) {
-      const { id } = allParams;
-      db.agents.findOne({ where: { id } })
+  async post(request, response) {
+
+    //things needed to make a record in auditLogs
+    const { userName, agent } = request.body;
+    const { id } = agent; //this gets the agent id
+
+    if (agent.id) {
+      const trail = await db.auditLogs.create({//side code to make a record in auditLogs
+        user_id: userName,
+        table_name: 'agents',
+        table_record_id: id,
+        action: 'update',
+        new_record: JSON.stringify(agent),
+      })
+
+      db.agents.findOne({ where: { id } })//find existing record by agentId and update it with agent
         .then((record) => {
-          record.update(allParams)
+          record.update(agent)
             .then((agt) => {
               response.status(201).json(agt);
             });
-        });
-    } else {
-      const { agent, synonym } = allParams;
-      db.agents.create(agent)
-        .then((res) => {
-          const agentID = res.dataValues.id;
-          synonym.agentId = agentID;
-          db.synonyms.create(synonym)
-            .then((agt) => {
-              response.status(201).json(agt);
-            });
-        });
+      });
+    } else {//if new agent created
+      const { agent, synonym } = request.body.agent;//synonym is part  of agent
+      const newAgent = await db.agents.create(agent);
+      const agentID = newAgent.dataValues.id;
+      synonym.agentId = agentID;
+      const agt = await db.synonyms.create(synonym)
+
+      await db.auditLogs.create({
+        user_id: userName,
+        table_name: 'agents',
+        table_record_id: agentID,
+        action: 'create',
+        new_record: JSON.stringify(agent),
+      });
+
+      await db.auditLogs.create({
+        user_id: userName,
+        table_name: 'synonyms',
+        table_record_id: agt.dataValues.id,
+        action: 'create',
+        new_record: JSON.stringify(synonym),
+      });
+      response.status(201).json(agt);
     }
   },
 };

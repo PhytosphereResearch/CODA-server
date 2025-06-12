@@ -1,4 +1,4 @@
-const {Sequelize} = require('sequelize');
+const { Sequelize } = require('sequelize');
 
 if (process.env.NODE_ENV !== 'production') {
   const dotenv = require('dotenv'); //eslint-disable-line
@@ -15,15 +15,28 @@ const host = process.env.RDS_DB_HOST;
 const orm = new Sequelize(database, user, pass, {
   host,
   dialect: 'mysql',
-  port:3306
-  });
- 
+  port: 3306
+});
+
 // try {
 //   await orm.authenticate();
 //   console.log('Connection has been established successfully.');
 // } catch (error) {
 //   console.error('Unable to connect to the database:', error);
 // }
+
+const auditLogs = orm.define('auditlogs', {
+  user_id: Sequelize.STRING,
+  table_name: Sequelize.STRING,
+  table_record_id: Sequelize.INTEGER,
+  action: Sequelize.STRING,
+  new_record: Sequelize.BLOB,//this is the record after it was created or updated
+  date_time: Sequelize.DATE,
+}, {
+  timestamps: true,
+  updatedAt: false,
+  createdAt: 'date_time',
+});
 
 const oaks = orm.define('oaks', {
   genus: Sequelize.STRING,
@@ -59,6 +72,8 @@ const agents = orm.define('agents', {
   ecology: Sequelize.STRING,
   commonName: Sequelize.STRING,
   notes: Sequelize.BLOB,
+  bookLink: Sequelize.STRING,
+  original_coda_record: Sequelize.BOOLEAN,
 }, {
   createdAt: false,
   updatedAt: false,
@@ -192,3 +207,4 @@ exports.hiSymptoms = hiSymptoms;
 exports.hiSymptomHelpers = hiSymptomHelpers;
 exports.hiReferences = hiReferences;
 exports.hiLocations = hiLocations;
+exports.auditLogs = auditLogs;

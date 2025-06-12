@@ -1,6 +1,6 @@
+
 const dotenv = require("dotenv");
 const { auth } = require("express-oauth2-jwt-bearer");
-
 dotenv.config();
 
 const checkJwt = auth({
@@ -39,7 +39,7 @@ const generateAllow = function (principalId, resource) {
   return policy;
 };
 
-const handler = async (event, context, callback) => {
+const handler = async (event, context, callback) => { 
   try {
     await checkJwt(
       { headers: { authorization: event.authorizationToken }, is: () => false },
