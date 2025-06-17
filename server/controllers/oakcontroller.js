@@ -17,7 +17,6 @@ module.exports = {
 
   async getOaksByAgent(request, response) {
     const agentId = request.params.agentId;
-    console.log("agentId", agentId);
     try {
       const data = await db.oaks.findAll({
         attributes: ['id', 'genus', 'species', 'subSpecies'],
@@ -32,7 +31,6 @@ module.exports = {
 
   async getOakById(request, response) {
     const id = request.params.id;
-    console.log("id", id);
     try {
       const oak = await db.oaks.findOne({ where: { id }, logging: console.log })
       response.status(200).json(oak);
@@ -48,9 +46,8 @@ module.exports = {
       const id = params.id;
       const { userName } = request.body;
 
-      //to create record in auditlogs for editing oak
       if (id) {
-        const trail = await db.auditLogs.create({//side code to make a record in auditLogs
+        const trail = await db.auditLogs.create({//to create record in auditlogs for updating oak record
           user_id: userName,
           table_name: 'oaks',
           table_record_id: id,
