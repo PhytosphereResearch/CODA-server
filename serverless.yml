@@ -5,7 +5,7 @@ service: express-app
 
 provider:
   name: aws
-  runtime: nodejs20.x
+  runtime: nodejs18.x
   vpc:
     securityGroupIds: ${split(${env:SECURITY_GROUP_IDS}, ',')}
     subnetIds: ${split(${env:SUBNET_IDS}, ',')}
