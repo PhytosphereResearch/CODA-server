@@ -40,24 +40,35 @@ module.exports = {
 
   async addOak(request, response) { // post a new oak record or update
     try {
-    const params = request.body;
-    if (params.id) {
-      const id = params.id;
-      const oak = await db.oaks.findOne({ where: { id } })
-        .then((record) => {
-          record.update(params)
-            .then((oak) => {
-              response.status(201).json(oak);
-            })
+      const { oak, userName } = request.body;
+      const { id } = oak;
+
+      if (id) {
+        await db.auditLogs.create({//to create record in auditlogs for updating oak record
+          user_id: userName,
+          table_name: 'oaks',
+          table_record_id: id,
+          action: 'update',
+          new_record: JSON.stringify(oak),
         })
-    } else {
-      db.oaks.create(params)
-        .then((oak) => {
-          response.status(201).json(oak);
+
+        const record = await db.oaks.findOne({ where: { id } })
+        const updatedOak = await record.update(oak)
+        return response.status(201).json(updatedOak);
+
+      } else {
+        const newOak = await db.oaks.create(oak)
+        db.auditLogs.create({//side code to make a record in auditLogs for add oak
+          user_id: userName,
+          table_name: 'oaks',
+          table_record_id: newOak.id,
+          action: 'create',
+          new_record: JSON.stringify(oak),
         })
+        return response.status(201).json(newOak);
+      }
+    } catch (err) {
+      helper.handleError(response)(err);
     }
-  } catch (err) {
-    helper.handleError(response)(err);
-  }
   },
 };
