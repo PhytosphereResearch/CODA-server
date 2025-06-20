@@ -62,7 +62,7 @@ module.exports = {
     const { id } = agent; //this gets the agent id
 
     if (agent.id) {
-      const trail = await db.auditLogs.create({//side code to make a record in auditLogs
+      await db.auditLogs.create({//side code to make a record in auditLogs
         user_id: userName,
         table_name: 'agents',
         table_record_id: id,
@@ -76,7 +76,7 @@ module.exports = {
             .then((agt) => {
               response.status(201).json(agt);
             });
-      });
+        });
     } else {//if new agent created
       const { agent, synonym } = request.body.agent;//synonym is part  of agent
       const newAgent = await db.agents.create(agent);
