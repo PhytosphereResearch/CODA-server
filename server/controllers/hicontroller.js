@@ -144,7 +144,7 @@ module.exports = {
   async searchByOakAndAgentId(request, response) {
     const { agentId, oakId } = request.query;
     try {
-      const data = await db.hostInteractions.findOne({
+      await db.hostInteractions.findOne({
         include: [
           { model: db.hiSymptoms, include: [{ model: db.symptoms }] },
           { model: db.oaks, where: { id: oakId } },
