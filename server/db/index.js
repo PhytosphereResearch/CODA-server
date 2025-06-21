@@ -68,6 +68,8 @@ const oaks = orm.define('oaks', {
   updatedAt: false,
 });
 
+console.log('oaks', oaks)
+
 const agents = orm.define('agents', {
   torder: Sequelize.STRING,
   family: Sequelize.STRING,

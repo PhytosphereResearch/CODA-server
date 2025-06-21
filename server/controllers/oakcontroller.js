@@ -7,6 +7,7 @@ module.exports = {
     console.log('Getting all oaks')
     try {
       const data = await db.oaks.findAll();
+      console.log('oak data', data)
       response.status(200).json(data);
     }
     catch (err) {
