@@ -25,8 +25,6 @@ const initOrm = () => {
 
 const orm = initOrm();
 
-console.log('orm', orm)
-
 // try {
 //   await orm.authenticate();
 //   console.log('Connection has been established successfully.');
