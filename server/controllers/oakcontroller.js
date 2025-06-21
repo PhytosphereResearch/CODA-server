@@ -4,6 +4,7 @@ const helper = require('./helper');
 module.exports = {
 
   async getAllOaks(request, response) {
+    console.log('Getting all oaks')
     try {
       const data = await db.oaks.findAll();
       response.status(200).json(data);
@@ -40,24 +41,24 @@ module.exports = {
 
   async addOak(request, response) { // post a new oak record or update
     try {
-    const params = request.body;
-    if (params.id) {
-      const id = params.id;
-      const oak = await db.oaks.findOne({ where: { id } })
-        .then((record) => {
-          record.update(params)
-            .then((oak) => {
-              response.status(201).json(oak);
-            })
-        })
-    } else {
-      db.oaks.create(params)
-        .then((oak) => {
-          response.status(201).json(oak);
-        })
+      const params = request.body;
+      if (params.id) {
+        const id = params.id;
+        const oak = await db.oaks.findOne({ where: { id } })
+          .then((record) => {
+            record.update(params)
+              .then((oak) => {
+                response.status(201).json(oak);
+              })
+          })
+      } else {
+        db.oaks.create(params)
+          .then((oak) => {
+            response.status(201).json(oak);
+          })
+      }
+    } catch (err) {
+      helper.handleError(response)(err);
     }
-  } catch (err) {
-    helper.handleError(response)(err);
-  }
   },
 };
