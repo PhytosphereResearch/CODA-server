@@ -12,13 +12,14 @@ const host = process.env.RDS_DB_HOST;
 
 const initOrm = () => {
   try {
+    console.log('Initializing DB Connection')
     return new Sequelize(database, user, pass, {
       host,
       dialect: 'mysql',
       port: 3306
     });
   } catch (e) {
-    console.error('Database Connection error: ', e)
+    console.log('Database Connection error: ', e)
   }
 }
 
