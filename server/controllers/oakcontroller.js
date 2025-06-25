@@ -4,10 +4,8 @@ const helper = require('./helper');
 module.exports = {
 
   async getAllOaks(request, response) {
-    console.log('Getting all oaks')
     try {
       const data = await db.oaks.findAll();
-      console.log('oak data', data)
       response.status(200).json(data);
     }
     catch (err) {
@@ -32,7 +30,7 @@ module.exports = {
   async getOakById(request, response) {
     const id = request.params.id;
     try {
-      const oak = await db.oaks.findOne({ where: { id }, logging: console.log })
+      const oak = await db.oaks.findOne({ where: { id } })
       response.status(200).json(oak);
     }
     catch (err) {
@@ -43,34 +41,30 @@ module.exports = {
   async addOak(request, response) { // post a new oak record or update
     try {
       const { oak, userName } = request.body;
-      const { id } = oak;
+      const isUpdate = !!oak.id;
+      let res;
 
-      if (id) {
-        await db.auditLogs.create({//to create record in auditlogs for updating oak record
-          user_id: userName,
-          table_name: 'oaks',
-          table_record_id: id,
-          action: 'update',
-          new_record: JSON.stringify(oak),
-        })
-
+      if (isUpdate) {
+        const { id } = oak;
         const record = await db.oaks.findOne({ where: { id } })
-        const updatedOak = await record.update(oak)
-        return response.status(201).json(updatedOak);
-
+       res = await record.update(oak)
       } else {
-        const newOak = await db.oaks.create(oak)
-        db.auditLogs.create({//side code to make a record in auditLogs for add oak
+        res = await db.oaks.create(oak)
+      }
+
+      await db.auditLogs.create({//side code to make a record in auditLogs for add or edit oak
           user_id: userName,
           table_name: 'oaks',
-          table_record_id: newOak.id,
-          action: 'create',
+          table_record_id: res.id,
+          action: isUpdate ? 'update' : 'create', 
           new_record: JSON.stringify(oak),
         })
-        return response.status(201).json(newOak);
-      }
+       
+      return response.status(201).json(res);    
     } catch (err) {
       helper.handleError(response)(err);
     }
+ 
   },
+
 };
