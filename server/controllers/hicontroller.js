@@ -167,33 +167,48 @@ module.exports = {
   },
 
   async addOrUpdate(request, response) {
-    const allParams = request.body;
-    const hiParams = {};
-    hiParams.questionable = allParams.questionable;
-    hiParams.situation = allParams.situation.join(';');
-    hiParams.hostLifeStage = allParams.hostLifeStage.join(';');
-    hiParams.notes = allParams.notes;
-    const hiSymptomList = Object.keys(allParams.hiSymptoms).map(key => allParams.hiSymptoms[key]);
-    return Promise.resolve()
-      .then(() => {
-        if (allParams.id) {
-          const { id } = allParams;
+    try {
+      const { hi, userName} = request.body;
+      console.log ( "hi", hi);
+      const hiParams = {};
+      console.log ("hiParams", hiParams)
+      let res;
+      const isUpdate = !!hi.id;
+      hiParams.questionable = hi.questionable;
+      hiParams.situation = hi.situation.join(';');
+      hiParams.hostLifeStage = hi.hostLifeStage.join(';');
+      hiParams.notes = hi.notes;
+      const hiSymptomList = Object.keys(hi.hiSymptoms).map(key => hi.hiSymptoms[key]);
+          
+        if (isUpdate) {
+          const { id } = hi;
           hiParams.id = id;
-          return db.hostInteractions.findOne({ where: { id } })
-            .then(record => record.update(hiParams));
+          const record= await db.hostInteractions.findOne({ where: { id } })
+          res = await record.update(hiParams)
+        } else {
+        hiParams.oakId = hi.oakId;
+        hiParams.agentId = hi.agentId;
+        res = await db.hostInteractions.create(hiParams);
+        console.log("res", res);
+        hiSymptomList.forEach(hiSymptom => hiSymptom.hostInteractionId = res.id);
         }
-        hiParams.oakId = allParams.oakId;
-        hiParams.agentId = allParams.agentId;
-        return db.hostInteractions.create(hiParams)
-          .then((record) => {
-            hiSymptomList.forEach(hiSymptom => hiSymptom.hostInteractionId = record.id);
-            return record;
-          });
-      })
-      .then(hi => Promise.all([
-        updateHiLocations(hi, allParams.countiesByRegions),
-        updateHiReferences(hi, allParams.bibs),
-      ].concat(hiSymptomList.map(hiSymptom => updateHiSymptom(hiSymptom)))))
-      .then(() => response.status(201).json({ message: 'Updated' }));
-  },
+        res = await Promise.all([
+        updateHiLocations(res, res.countiesByRegions),
+        updateHiReferences(res, res.bibs),
+      ].concat(hiSymptomList.map(hiSymptom => updateHiSymptom(hiSymptom))))
+   
+  await db.auditLogs.create({//side code to make a record in auditLogs
+    user_id: userName,
+    table_name: 'hostinteractions',
+    table_record_id: isUpdate ? hi.id : res.id,
+    action: isUpdate ? 'update' : 'create',
+    new_record: JSON.stringify(hi),
+  })
+
+
+  return response.status(201).json(res);
+} catch (error) {
+  return response.status(500).json(error);
+}
+}
 };
