@@ -168,10 +168,8 @@ module.exports = {
 
   async addOrUpdate(request, response) {
     try {
-      const { hi, userName} = request.body;
-      console.log ( "hi", hi);
+      const { hi, userName } = request.body;
       const hiParams = {};
-      console.log ("hiParams", hiParams)
       let res;
       const isUpdate = !!hi.id;
       hiParams.questionable = hi.questionable;
@@ -179,36 +177,43 @@ module.exports = {
       hiParams.hostLifeStage = hi.hostLifeStage.join(';');
       hiParams.notes = hi.notes;
       const hiSymptomList = Object.keys(hi.hiSymptoms).map(key => hi.hiSymptoms[key]);
-          
-        if (isUpdate) {
-          const { id } = hi;
-          hiParams.id = id;
-          const record= await db.hostInteractions.findOne({ where: { id } })
-          res = await record.update(hiParams)
-        } else {
+
+      if (isUpdate) {
+        const { id } = hi;
+        hiParams.id = id;
+        const record = await db.hostInteractions.findOne({ where: { id } })
+        res = await record.update(hiParams)
+      } else {
         hiParams.oakId = hi.oakId;
         hiParams.agentId = hi.agentId;
         res = await db.hostInteractions.create(hiParams);
-        console.log("res", res);
         hiSymptomList.forEach(hiSymptom => hiSymptom.hostInteractionId = res.id);
-        }
-        res = await Promise.all([
-        updateHiLocations(res, res.countiesByRegions),
-        updateHiReferences(res, res.bibs),
-      ].concat(hiSymptomList.map(hiSymptom => updateHiSymptom(hiSymptom))))
-   
-  await db.auditLogs.create({//side code to make a record in auditLogs
-    user_id: userName,
-    table_name: 'hostinteractions',
-    table_record_id: isUpdate ? hi.id : res.id,
-    action: isUpdate ? 'update' : 'create',
-    new_record: JSON.stringify(hi),
-  })
+      }
 
+      let rec = await Promise.all([
+        updateHiLocations(res, hi.countiesByRegions),
+        updateHiReferences(res, hi.bibs),
+      ].concat(hiSymptomList.map(hiSymptom => updateHiSymptom(hiSymptom))));
 
-  return response.status(201).json(res);
-} catch (error) {
-  return response.status(500).json(error);
-}
-}
+      if (isUpdate) {
+        let { dataValues, isNewRecord } = res;
+        rec = { dataValues, isNewRecord, ...rec };
+      }
+      else {
+        rec = hi;
+      }
+
+      await db.auditLogs.create({//side code to make a record in auditLogs
+        user_id: userName,
+        table_name: 'hostinteractions or related',
+        table_record_id: isUpdate ? hi.id : res.id,
+        action: isUpdate ? 'update' : 'create',
+        new_record: JSON.stringify(rec),
+      })
+
+      return response.status(201).json(res);
+    } catch (error) {
+      return response.status(500).json(error);
+    }
+  }
 };
