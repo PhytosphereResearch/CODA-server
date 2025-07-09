@@ -2,6 +2,7 @@ const db = require('../db');
 const helper = require('./helper');
 const Sequelize = require('sequelize');
 const uniq = require('lodash.uniq');
+const { UPDATE, CREATE } = require('./constants');
 
 const { Op } = Sequelize;
 
@@ -190,14 +191,15 @@ module.exports = {
         hiSymptomList.forEach(hiSymptom => hiSymptom.hostInteractionId = res.id);
       }
 
-      let rec = await Promise.all([
+      let [hiLocations, hiReferences, ...hiSymptoms] = await Promise.all([
         updateHiLocations(res, hi.countiesByRegions),
         updateHiReferences(res, hi.bibs),
       ].concat(hiSymptomList.map(hiSymptom => updateHiSymptom(hiSymptom))));
 
+      let rec={};
       if (isUpdate) {
         let { dataValues, isNewRecord } = res;
-        rec = { dataValues, isNewRecord, ...rec };
+        rec = { dataValues, isNewRecord, hiLocations, hiReferences, hiSymptoms };
       }
       else {
         rec = hi;
@@ -207,7 +209,7 @@ module.exports = {
         user_id: userName,
         table_name: 'hostinteractions or related',
         table_record_id: isUpdate ? hi.id : res.id,
-        action: isUpdate ? 'update' : 'create',
+        action: isUpdate ? UPDATE : CREATE,
         new_record: JSON.stringify(rec),
       })
 

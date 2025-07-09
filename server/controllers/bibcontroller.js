@@ -1,4 +1,5 @@
 const db = require('../db');
+const { UPDATE, CREATE } = require('./constants');
 const helper = require('./helper');
 
 module.exports = {
@@ -31,7 +32,7 @@ module.exports = {
         user_id: userName,
         table_name: 'bibs',
         table_record_id: res.id,
-        action: isUpdate ? 'update' : 'create',
+        action: isUpdate ? UPDATE : CREATE,
         new_record: JSON.stringify(reference),
       })
 

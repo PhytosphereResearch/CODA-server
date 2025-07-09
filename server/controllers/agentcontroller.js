@@ -1,6 +1,7 @@
 const db = require('../db');
 const Sequelize = require('sequelize');
 const helper = require('./helper');
+const { UPDATE, CREATE } = require('./constants');
 
 const getDistinct = (colName, colAlias) => db.agents.findAll({
   attributes: [
@@ -66,7 +67,7 @@ module.exports = {
         user_id: userName,
         table_name: 'agents',
         table_record_id: id,
-        action: 'update',
+        action: UPDATE,
         new_record: JSON.stringify(agent),
       })
 
@@ -88,7 +89,7 @@ module.exports = {
         user_id: userName,
         table_name: 'agents',
         table_record_id: agentID,
-        action: 'create',
+        action: CREATE,
         new_record: JSON.stringify(agent),
       });
 
@@ -96,7 +97,7 @@ module.exports = {
         user_id: userName,
         table_name: 'synonyms',
         table_record_id: agt.dataValues.id,
-        action: 'create',
+        action: CREATE,
         new_record: JSON.stringify(synonym),
       });
       response.status(201).json(agt);
