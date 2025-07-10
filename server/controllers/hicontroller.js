@@ -2,6 +2,7 @@ const db = require('../db');
 const helper = require('./helper');
 const Sequelize = require('sequelize');
 const uniq = require('lodash.uniq');
+const { UPDATE, CREATE } = require('./constants');
 
 const { Op } = Sequelize;
 
@@ -144,7 +145,7 @@ module.exports = {
   async searchByOakAndAgentId(request, response) {
     const { agentId, oakId } = request.query;
     try {
-      const data = await db.hostInteractions.findOne({
+      await db.hostInteractions.findOne({
         include: [
           { model: db.hiSymptoms, include: [{ model: db.symptoms }] },
           { model: db.oaks, where: { id: oakId } },
@@ -167,33 +168,54 @@ module.exports = {
   },
 
   async addOrUpdate(request, response) {
-    const allParams = request.body;
-    const hiParams = {};
-    hiParams.questionable = allParams.questionable;
-    hiParams.situation = allParams.situation.join(';');
-    hiParams.hostLifeStage = allParams.hostLifeStage.join(';');
-    hiParams.notes = allParams.notes;
-    const hiSymptomList = Object.keys(allParams.hiSymptoms).map(key => allParams.hiSymptoms[key]);
-    return Promise.resolve()
-      .then(() => {
-        if (allParams.id) {
-          const { id } = allParams;
-          hiParams.id = id;
-          return db.hostInteractions.findOne({ where: { id } })
-            .then(record => record.update(hiParams));
-        }
-        hiParams.oakId = allParams.oakId;
-        hiParams.agentId = allParams.agentId;
-        return db.hostInteractions.create(hiParams)
-          .then((record) => {
-            hiSymptomList.forEach(hiSymptom => hiSymptom.hostInteractionId = record.id);
-            return record;
-          });
+    try {
+      const { hi, userName } = request.body;
+      const hiParams = {};
+      let res;
+      const isUpdate = !!hi.id;
+      hiParams.questionable = hi.questionable;
+      hiParams.situation = hi.situation.join(';');
+      hiParams.hostLifeStage = hi.hostLifeStage.join(';');
+      hiParams.notes = hi.notes;
+      const hiSymptomList = Object.keys(hi.hiSymptoms).map(key => hi.hiSymptoms[key]);
+
+      if (isUpdate) {
+        const { id } = hi;
+        hiParams.id = id;
+        const record = await db.hostInteractions.findOne({ where: { id } })
+        res = await record.update(hiParams)
+      } else {
+        hiParams.oakId = hi.oakId;
+        hiParams.agentId = hi.agentId;
+        res = await db.hostInteractions.create(hiParams);
+        hiSymptomList.forEach(hiSymptom => hiSymptom.hostInteractionId = res.id);
+      }
+
+      let [hiLocations, hiReferences, ...hiSymptoms] = await Promise.all([
+        updateHiLocations(res, hi.countiesByRegions),
+        updateHiReferences(res, hi.bibs),
+      ].concat(hiSymptomList.map(hiSymptom => updateHiSymptom(hiSymptom))));
+
+      let rec={};
+      if (isUpdate) {
+        let { dataValues, isNewRecord } = res;
+        rec = { dataValues, isNewRecord, hiLocations, hiReferences, hiSymptoms };
+      }
+      else {
+        rec = hi;
+      }
+
+      await db.auditLogs.create({//side code to make a record in auditLogs
+        user_id: userName,
+        table_name: 'hostinteractions or related',
+        table_record_id: isUpdate ? hi.id : res.id,
+        action: isUpdate ? UPDATE : CREATE,
+        new_record: JSON.stringify(rec),
       })
-      .then(hi => Promise.all([
-        updateHiLocations(hi, allParams.countiesByRegions),
-        updateHiReferences(hi, allParams.bibs),
-      ].concat(hiSymptomList.map(hiSymptom => updateHiSymptom(hiSymptom)))))
-      .then(() => response.status(201).json({ message: 'Updated' }));
-  },
+
+      return response.status(201).json(res);
+    } catch (error) {
+      return response.status(500).json(error);
+    }
+  }
 };

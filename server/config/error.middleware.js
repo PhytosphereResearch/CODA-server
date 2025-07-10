@@ -1,9 +1,8 @@
 const {
     InvalidTokenError,
-    UnauthorizedError,
 } = require("express-oauth2-jwt-bearer");
 
-const errorHandler = (error, request, response, next) => {
+const errorHandler = (error, request, response) => {
     if (error instanceof InvalidTokenError) {
         const message = "Bad credentials";
 

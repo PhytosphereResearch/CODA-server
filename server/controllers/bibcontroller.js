@@ -1,4 +1,5 @@
 const db = require('../db');
+const { UPDATE, CREATE } = require('./constants');
 const helper = require('./helper');
 
 module.exports = {
@@ -13,25 +14,33 @@ module.exports = {
     }
   },
 
-  addOrUpdate(request, response) {
-    const newReference = request.body;
-    if (newReference.id) {
-      const { id } = newReference;
-      delete newReference.id;
-      db.bibs.findOne({ where: { id } })
-        .then((record) => {
-          record.update(newReference)
-            .then((res) => {
-              response.status(201).json(res);
-            });
-        });
-    } else {
-      // console.log('posting a new reference record');
-      db.bibs.create(newReference)
-        .then((res) => {
-          response.status(201).json(res);
-        });
+  async addOrUpdate(request, response) {
+    try {
+      const { reference, userName } = request.body;
+      const isUpdate = !!reference.id
+      let res;
+
+      if (isUpdate) {
+        const { id } = reference;
+        const record = await db.bibs.findOne({ where: { id } })
+        res = await record.update(reference)
+      } else {
+        res = await db.bibs.create(reference)
+      }
+
+      await db.auditLogs.create({//side code to make a record in auditLogs
+        user_id: userName,
+        table_name: 'bibs',
+        table_record_id: res.id,
+        action: isUpdate ? UPDATE : CREATE,
+        new_record: JSON.stringify(reference),
+      })
+
+      return response.status(201).json(res);
+    } catch (err) {
+      helper.handleError(response)(err);
     }
+
   },
 
 };

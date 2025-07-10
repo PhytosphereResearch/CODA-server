@@ -1,6 +1,7 @@
 const db = require('../db');
 const Sequelize = require('sequelize');
 const helper = require('./helper');
+const { UPDATE, CREATE } = require('./constants');
 
 const getDistinct = (colName, colAlias) => db.agents.findAll({
   attributes: [
@@ -62,11 +63,11 @@ module.exports = {
     const { id } = agent; //this gets the agent id
 
     if (agent.id) {
-      const trail = await db.auditLogs.create({//side code to make a record in auditLogs
+      await db.auditLogs.create({//side code to make a record in auditLogs
         user_id: userName,
         table_name: 'agents',
         table_record_id: id,
-        action: 'update',
+        action: UPDATE,
         new_record: JSON.stringify(agent),
       })
 
@@ -76,7 +77,7 @@ module.exports = {
             .then((agt) => {
               response.status(201).json(agt);
             });
-      });
+        });
     } else {//if new agent created
       const { agent, synonym } = request.body.agent;//synonym is part  of agent
       const newAgent = await db.agents.create(agent);
@@ -88,7 +89,7 @@ module.exports = {
         user_id: userName,
         table_name: 'agents',
         table_record_id: agentID,
-        action: 'create',
+        action: CREATE,
         new_record: JSON.stringify(agent),
       });
 
@@ -96,7 +97,7 @@ module.exports = {
         user_id: userName,
         table_name: 'synonyms',
         table_record_id: agt.dataValues.id,
-        action: 'create',
+        action: CREATE,
         new_record: JSON.stringify(synonym),
       });
       response.status(201).json(agt);

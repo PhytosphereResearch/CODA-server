@@ -1,7 +1,7 @@
 const { Sequelize } = require('sequelize');
 
 if (process.env.NODE_ENV !== 'production') {
-  const dotenv = require('dotenv'); //eslint-disable-line
+  const dotenv = require('dotenv');
   dotenv.load();
 }
 
@@ -54,11 +54,11 @@ const oaks = orm.define('oaks', {
   authority: Sequelize.STRING,
   evergreen: Sequelize.STRING,
   acorns: Sequelize.STRING,
-  leaves: Sequelize.STRING(500), //eslint-disable-line
+  leaves: Sequelize.STRING(500),
   stems: Sequelize.STRING,
   treeForm: Sequelize.STRING,
   height: Sequelize.STRING,
-  distribution: Sequelize.STRING(1000), //eslint-disable-line
+  distribution: Sequelize.STRING(1000),
   hybrids: Sequelize.STRING,
   varieties: Sequelize.STRING,
   usdaCode: Sequelize.STRING,
@@ -132,7 +132,7 @@ const symptoms = orm.define('symptoms', {
 
 // GEOGRAPHY
 const countiesByRegions = orm.define('countiesByRegion', {
-  countyCode: Sequelize.STRING(3), //eslint-disable-line
+  countyCode: Sequelize.STRING(3),
   countyName: Sequelize.STRING,
   regionId: Sequelize.INTEGER,
   regionName: Sequelize.STRING,

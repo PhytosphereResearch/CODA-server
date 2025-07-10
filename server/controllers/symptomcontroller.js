@@ -1,4 +1,5 @@
 const db = require('../db');
+const { UPDATE, CREATE } = require('./constants');
 const helper = require('./helper');
 
 module.exports = {
@@ -14,23 +15,32 @@ module.exports = {
     }
   },
 
-  addOrUpdate(request, response) {
-    const symptom = request.body;
-    if (symptom.id) {
-      const { id } = symptom;
-      delete symptom.id;
-      db.symptoms.findOne({ where: { id } })
-        .then((record) => {
-          record.update(symptom)
-            .then((sympt) => {
-              response.status(201).json(sympt);
-            });
-        });
-    } else {
-      db.symptoms.create(symptom)
-        .then((sympt) => {
-          response.status(201).json(sympt);
-        });
+  async addOrUpdate(request, response) {
+    try {
+      const { symptom, userName } = request.body;
+      const isUpdate = !!symptom.id;
+      let res;
+      
+      if (isUpdate) {
+        const { id } = symptom;
+        const record = await db.symptoms.findOne({ where: { id } })
+        res = await record.update(symptom)
+      } 
+      else {
+        res = await db.symptoms.create(symptom)
+      }
+      
+      await db.auditLogs.create({//side code to make a record in auditLogs
+        user_id: userName,
+        table_name: 'symptoms',
+        table_record_id: res.id,
+        action: isUpdate ? UPDATE : CREATE,
+        new_record: JSON.stringify(symptom),
+      })
+
+      return response.status(201).json(res);
+    } catch (error) {
+      return response.status(500).json(error);
     }
   },
 };
