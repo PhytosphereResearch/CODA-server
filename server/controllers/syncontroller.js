@@ -23,11 +23,11 @@ module.exports = {
     try {
       const { synonym, userName } = request.body;
       let res;
-      let msg;
-      let isUpdate;
+      const isUpdate = !!synonym.id;
+      const msg = isUpdate ? 'Synonym updated' : 'Your synonym has been added';
 
       if (synonym.id) {//for editing an existing synonym
-
+        
         if (synonym.isPrimary === 1) { // changes other primary flags to false
           res = await db.synonyms.update(
             { isPrimary: 0 },
@@ -39,16 +39,12 @@ module.exports = {
 
           const { id } = synonym;
           const record = await db.synonyms.findOne({ where: { id } })
-          res = await record.update(synonym)
-          msg = 'Synonym updated';
-          isUpdate = true;
+          res = await record.update(synonym) 
         }
         else {//if editing fields other than is primary
           const { id } = synonym;
           const record = await db.synonyms.findOne({ where: { id } })
-          res = await record.update(synonym)
-           msg = 'Synonym updated';
-           isUpdate = true;
+          res = await record.update(synonym)           
         };
       } 
       else if (synonym.isPrimary === 1) { // for new synonym params.id undefined, changes other primary flags to false 
@@ -60,13 +56,9 @@ module.exports = {
           }
         )
         res = await db.synonyms.create(synonym)
-        msg = 'Your synonym has been added';
-        isUpdate = false;
       } 
       else {//if params.isPrimary=0 for a new synonym not in database
         res = await db.synonyms.create(synonym)
-        msg = 'Your synonym has been added';
-        isUpdate = false;
       }
 
       await db.auditLogs.create({//side code to make a record in auditLogs
