@@ -82,6 +82,7 @@ const agents = orm.define('agents', {
   commonName: Sequelize.STRING,
   notes: Sequelize.BLOB,
   originalCodaRecord: Sequelize.BOOLEAN,
+  bookLink: Sequelize.STRING,
 }, {
   createdAt: false,
   updatedAt: false,
