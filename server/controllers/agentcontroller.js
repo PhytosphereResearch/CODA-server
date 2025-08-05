@@ -2,6 +2,7 @@ const db = require('../db');
 const Sequelize = require('sequelize');
 const helper = require('./helper');
 const { UPDATE, CREATE } = require('./constants');
+const auditController = require('./auditcontroller');
 
 const getDistinct = (colName, colAlias) => db.agents.findAll({
   attributes: [
@@ -15,9 +16,12 @@ module.exports = {
 
   async findAgentRecord(request, response) { // get one agent AND associated counties and oaks
     const agentId = request.params.agtId;
+    console.log("agentId line 19", agentId);
+    const tableName = "agents";
+    const tableRecordId = agentId;
     try {
       const data = await db.agents.findOne({
-        where: { id: agentId },
+        where: { id: agentId }, 
         include: [
           { model: db.synonyms },
           {
@@ -28,9 +32,12 @@ module.exports = {
               { model: db.countiesByRegions },
             ],
           },
-        ],
+        ], 
       })
-      response.status(200).json(data);
+    
+      const auditRecords = await auditController.getAuditRecords( tableRecordId, tableName );
+      const dataParse = JSON.parse(JSON.stringify(data))
+      response.status(200).json({ ...dataParse, auditRecords });
     }
     catch (err) {
       helper.handleError(response)(err);
@@ -52,6 +59,7 @@ module.exports = {
           const option = options[index];
           fields[option] = field;
         });
+        
         response.status(200).json(fields);
       }).catch(helper.handleError(response));
   },
@@ -61,6 +69,7 @@ module.exports = {
     //things needed to make a record in auditLogs
     const { userName, agent } = request.body;
     const { id } = agent; //this gets the agent id
+    console.log("agent line 72", agent);
 
     if (agent.id) {
       await db.auditLogs.create({//side code to make a record in auditLogs
