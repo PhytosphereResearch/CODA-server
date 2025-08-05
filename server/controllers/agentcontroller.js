@@ -16,7 +16,6 @@ module.exports = {
 
   async findAgentRecord(request, response) { // get one agent AND associated counties and oaks
     const agentId = request.params.agtId;
-    console.log("agentId line 19", agentId);
     const tableName = "agents";
     const tableRecordId = agentId;
     try {
@@ -69,8 +68,7 @@ module.exports = {
     //things needed to make a record in auditLogs
     const { userName, agent } = request.body;
     const { id } = agent; //this gets the agent id
-    console.log("agent line 72", agent);
-
+   
     if (agent.id) {
       await db.auditLogs.create({//side code to make a record in auditLogs
         user_id: userName,
