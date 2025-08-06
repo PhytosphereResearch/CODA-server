@@ -20,7 +20,7 @@ module.exports = {
     const tableRecordId = agentId;
     try {
       const data = await db.agents.findOne({
-        where: { id: agentId }, 
+        where: { id: agentId },
         include: [
           { model: db.synonyms },
           {
@@ -31,10 +31,10 @@ module.exports = {
               { model: db.countiesByRegions },
             ],
           },
-        ], 
+        ],
       })
-    
-      const auditRecords = await auditController.getAuditRecords( tableRecordId, tableName );
+
+      const auditRecords = await auditController.getAuditRecords(tableRecordId, tableName);
       const dataParse = JSON.parse(JSON.stringify(data));
       response.status(200).json({ ...dataParse, auditRecords });
     }
@@ -58,7 +58,7 @@ module.exports = {
           const option = options[index];
           fields[option] = field;
         });
-        
+
         response.status(200).json(fields);
       }).catch(helper.handleError(response));
   },
@@ -68,7 +68,7 @@ module.exports = {
     //things needed to make a record in auditLogs
     const { userName, agent } = request.body;
     const { id } = agent; //this gets the agent id
-   
+
     if (agent.id) {
       await db.auditLogs.create({//side code to make a record in auditLogs
         user_id: userName,

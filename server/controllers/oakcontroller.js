@@ -65,7 +65,5 @@ module.exports = {
     } catch (err) {
       helper.handleError(response)(err);
     }
- 
   },
-
 };
