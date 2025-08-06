@@ -35,7 +35,7 @@ module.exports = {
       })
     
       const auditRecords = await auditController.getAuditRecords( tableRecordId, tableName );
-      const dataParse = JSON.parse(JSON.stringify(data))
+      const dataParse = JSON.parse(JSON.stringify(data));
       response.status(200).json({ ...dataParse, auditRecords });
     }
     catch (err) {
