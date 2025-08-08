@@ -2,6 +2,7 @@ const db = require('../db');
 const Sequelize = require('sequelize');
 const helper = require('./helper');
 const { UPDATE, CREATE } = require('./constants');
+const auditController = require('./auditcontroller');
 
 const getDistinct = (colName, colAlias) => db.agents.findAll({
   attributes: [
@@ -30,7 +31,10 @@ module.exports = {
           },
         ],
       })
-      response.status(200).json(data);
+
+      const auditRecords = await auditController.getAuditRecords(agentId, "agents");
+      const dataParse = JSON.parse(JSON.stringify(data));
+      response.status(200).json({ ...dataParse, auditRecords });
     }
     catch (err) {
       helper.handleError(response)(err);
@@ -52,6 +56,7 @@ module.exports = {
           const option = options[index];
           fields[option] = field;
         });
+
         response.status(200).json(fields);
       }).catch(helper.handleError(response));
   },

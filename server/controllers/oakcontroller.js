@@ -48,24 +48,22 @@ module.exports = {
       if (isUpdate) {
         const { id } = oak;
         const record = await db.oaks.findOne({ where: { id } })
-       res = await record.update(oak)
+        res = await record.update(oak)
       } else {
         res = await db.oaks.create(oak)
       }
 
       await db.auditLogs.create({//side code to make a record in auditLogs for add or edit oak
-          user_id: userName,
-          table_name: 'oaks',
-          table_record_id: res.id,
-          action: isUpdate ? UPDATE : CREATE, 
-          new_record: JSON.stringify(oak),
-        })
-       
-      return response.status(201).json(res);    
+        user_id: userName,
+        table_name: 'oaks',
+        table_record_id: res.id,
+        action: isUpdate ? UPDATE : CREATE,
+        new_record: JSON.stringify(oak),
+      })
+
+      return response.status(201).json(res);
     } catch (err) {
       helper.handleError(response)(err);
     }
- 
   },
-
 };
