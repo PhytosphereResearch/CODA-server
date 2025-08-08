@@ -16,8 +16,6 @@ module.exports = {
 
   async findAgentRecord(request, response) { // get one agent AND associated counties and oaks
     const agentId = request.params.agtId;
-    const tableName = "agents";
-    const tableRecordId = agentId;
     try {
       const data = await db.agents.findOne({
         where: { id: agentId },
@@ -34,7 +32,7 @@ module.exports = {
         ],
       })
 
-      const auditRecords = await auditController.getAuditRecords(tableRecordId, tableName);
+      const auditRecords = await auditController.getAuditRecords(agentId, "agents");
       const dataParse = JSON.parse(JSON.stringify(data));
       response.status(200).json({ ...dataParse, auditRecords });
     }
