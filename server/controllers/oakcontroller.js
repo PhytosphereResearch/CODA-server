@@ -1,15 +1,13 @@
-const db = require('../db');
-const { UPDATE, CREATE } = require('./constants');
-const helper = require('./helper');
+const db = require("../db");
+const { UPDATE, CREATE } = require("./constants");
+const helper = require("./helper");
 
 module.exports = {
-
   async getAllOaks(request, response) {
     try {
       const data = await db.oaks.findAll();
       response.status(200).json(data);
-    }
-    catch (err) {
+    } catch (err) {
       helper.handleError(response)(err);
     }
   },
@@ -18,12 +16,13 @@ module.exports = {
     const agentId = request.params.agentId;
     try {
       const data = await db.oaks.findAll({
-        attributes: ['id', 'genus', 'species', 'subSpecies'],
-        include: [{ model: db.hostInteractions, required: true, where: { agentId } }]
-      })
+        attributes: ["id", "genus", "species", "subSpecies"],
+        include: [
+          { model: db.hostInteractions, required: true, where: { agentId } },
+        ],
+      });
       response.status(200).json(data);
-    }
-    catch (err) {
+    } catch (err) {
       helper.handleError(response)(err);
     }
   },
@@ -31,15 +30,16 @@ module.exports = {
   async getOakById(request, response) {
     const id = request.params.id;
     try {
-      const oak = await db.oaks.findOne({ where: { id } })
+      const oak = await db.oaks.findOne({ where: { id } });
       response.status(200).json(oak);
-    }
-    catch (err) {
+    } catch (err) {
       helper.handleError(response)(err);
     }
   },
 
-  async addOak(request, response) { // post a new oak record or update
+  async addOak(request, response) {
+    // post a new oak record or update
+    console.log("ADD OR UPDATE OAK");
     try {
       const { oak, userName } = request.body;
       const isUpdate = !!oak.id;
@@ -47,19 +47,20 @@ module.exports = {
 
       if (isUpdate) {
         const { id } = oak;
-        const record = await db.oaks.findOne({ where: { id } })
-        res = await record.update(oak)
+        const record = await db.oaks.findOne({ where: { id } });
+        res = await record.update(oak);
       } else {
-        res = await db.oaks.create(oak)
+        res = await db.oaks.create(oak);
       }
 
-      await db.auditLogs.create({//side code to make a record in auditLogs for add or edit oak
+      await db.auditLogs.create({
+        //side code to make a record in auditLogs for add or edit oak
         user_id: userName,
-        table_name: 'oaks',
+        table_name: "oaks",
         table_record_id: res.id,
         action: isUpdate ? UPDATE : CREATE,
         new_record: JSON.stringify(oak),
-      })
+      });
 
       return response.status(201).json(res);
     } catch (err) {
