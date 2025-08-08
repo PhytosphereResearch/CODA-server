@@ -43,13 +43,17 @@ const generateAllow = function (principalId, resource) {
 const handler = async (event, context, callback) => {
   console.log("Attempting to authorize user");
   try {
+    console.log("Preparing to check JWT");
     await checkJwt(
       { headers: { authorization: event.authorizationToken }, is: () => false },
       {},
       (err) => {
+        console.log("Checking JWT");
         if (err) {
+          console.err("PROBLEM WITH JWT");
           throw err;
         }
+        console.log("Generating policy...");
         const policy = generateAllow(
           "user",
           `${process.env.LAMBDA_ARN}/dev/POST/*`
