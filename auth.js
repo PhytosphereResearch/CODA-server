@@ -1,4 +1,3 @@
-
 const dotenv = require("dotenv");
 const { auth } = require("express-oauth2-jwt-bearer");
 dotenv.config();
@@ -18,16 +17,18 @@ const generatePolicy = function (principalId, effect, resource) {
       stringKey: "stringval",
       numberKey: 123,
       booleanKey: true,
-    }
+    },
   };
   if (effect && resource) {
     const policyDocument = {
-      Version:"2012-10-17",
-      Statement: [{
-        Action: "execute-api:Invoke",
-        Effect: effect,
-        Resource: resource
-      }],
+      Version: "2012-10-17",
+      Statement: [
+        {
+          Action: "execute-api:Invoke",
+          Effect: effect,
+          Resource: resource,
+        },
+      ],
     };
     authResponse.policyDocument = policyDocument;
   }
@@ -39,7 +40,8 @@ const generateAllow = function (principalId, resource) {
   return policy;
 };
 
-const handler = async (event, context, callback) => { 
+const handler = async (event, context, callback) => {
+  console.log("Attempting to authorize user");
   try {
     await checkJwt(
       { headers: { authorization: event.authorizationToken }, is: () => false },
@@ -48,7 +50,11 @@ const handler = async (event, context, callback) => {
         if (err) {
           throw err;
         }
-        const policy = generateAllow("user", `${process.env.LAMBDA_ARN}/dev/POST/*`);
+        const policy = generateAllow(
+          "user",
+          `${process.env.LAMBDA_ARN}/dev/POST/*`
+        );
+        console.log("Successfully generated policy");
         callback(null, policy);
       }
     );
