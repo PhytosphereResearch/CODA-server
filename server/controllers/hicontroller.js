@@ -3,6 +3,7 @@ const helper = require('./helper');
 const Sequelize = require('sequelize');
 const uniq = require('lodash.uniq');
 const { UPDATE, CREATE } = require('./constants');
+const auditController = require('./auditcontroller');
 
 const { Op } = Sequelize;
 
@@ -123,7 +124,10 @@ module.exports = {
         ],
         where: { id: hiId },
       });
-      response.status(200).json(data);
+      const auditRecords = await auditController.getAuditRecords(hiId, "hostinteractions");
+      const dataParse = JSON.parse(JSON.stringify(data));
+   
+      response.status(200).json({ ...dataParse, auditRecords });
     }
     catch (err) {
       helper.handleError(response)(err);
@@ -196,7 +200,7 @@ module.exports = {
         updateHiReferences(res, hi.bibs),
       ].concat(hiSymptomList.map(hiSymptom => updateHiSymptom(hiSymptom))));
 
-      let rec={};
+      let rec = {};
       if (isUpdate) {
         let { dataValues, isNewRecord } = res;
         rec = { dataValues, isNewRecord, hiLocations, hiReferences, hiSymptoms };
