@@ -54,7 +54,7 @@ const handler = async (event, context, callback) => {
       (err) => {
         console.log("Checking JWT");
         if (err) {
-          console.err("PROBLEM WITH JWT");
+          console.log("PROBLEM WITH JWT", err, `DOMAIN: ${process.env.AUTH0_DOMAIN} AUDIENCE: ${process.env.AUTH0_AUDIENCE}`);
           throw err;
         }
         console.log("Generating policy...");
