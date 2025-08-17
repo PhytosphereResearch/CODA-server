@@ -14,6 +14,11 @@ provider:
 
 functions:
   app:
+    environment:
+      RDS_DB_HOST: ${aws:ssm:/CODA_DB_HOST}
+      RDS_DB_NAME: ${aws:ssm:/CODA_DB_NAME}
+      RDS_PASSWORD: ${aws:ssm:/CODA_DB_PASSWORD}
+      RDS_USERNAME: ${aws:ssm:/CODA_DB_USERNAME}
     handler: app.handler
     events:
       - http:
@@ -28,4 +33,7 @@ functions:
             name: authorizerFunc
             type: token
   authorizerFunc:
+    environment:
+      AUTH0_AUDIENCE: ${aws:ssm:/CODA_AUTH0_AUDIENCE}
+      AUTH0_DOMAIN: ${aws:ssm:/CODA_AUTH0_DOMAIN}
     handler: auth.handler
