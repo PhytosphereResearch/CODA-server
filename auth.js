@@ -39,11 +39,14 @@ const generateAllow = function (principalId, resource) {
 };
 
 const handler = async (event, context, callback) => {
+  console.log('Executing authorizer function')
+  console.log('Test policy:', generateAllow("user", `${process.env.LAMBDA_ARN}/dev/POST/`))
   try {
     checkJwt(
       { headers: { authorization: event.authorizationToken }, is: () => false },
       {},
       (err) => {
+        console.log('Error?', err)
         if (err) {
           throw err;
         }
@@ -55,6 +58,7 @@ const handler = async (event, context, callback) => {
     );
   } catch (e) {
     console.error("Error->\n", e);
+    console.log('Authorizer failure:', e)
     callback("Unauthorized");
   }
 };
