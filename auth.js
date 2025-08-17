@@ -42,10 +42,6 @@ const generateAllow = function (principalId, resource) {
 
 const handler = async (event, context, callback) => {
   console.log("Attempting to authorize user");
-  console.log(
-    "Test policy:",
-    generateAllow("user", `${process.env.LAMBDA_ARN}/dev/POST/`)
-  );
   try {
     console.log("Preparing to check JWT");
     await checkJwt(
@@ -54,7 +50,6 @@ const handler = async (event, context, callback) => {
       (err) => {
         console.log("Checking JWT");
         if (err) {
-          console.log("PROBLEM WITH JWT", err, `DOMAIN: ${process.env.AUTH0_DOMAIN} AUDIENCE: ${process.env.AUTH0_AUDIENCE}`);
           throw err;
         }
         console.log("Generating policy...");
@@ -62,7 +57,7 @@ const handler = async (event, context, callback) => {
           "user",
           `${process.env.LAMBDA_ARN}/dev/POST/*`
         );
-        console.log("Successfully generated policy");
+        console.log("Successfully generated policy", JSON.stringify(policy));
         callback(null, policy);
       }
     );
