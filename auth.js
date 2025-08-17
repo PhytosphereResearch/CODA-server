@@ -13,11 +13,6 @@ const generatePolicy = function (principalId, effect, resource) {
   // Required output:
   const authResponse = {
     principalId,
-    context: {
-      stringKey: "stringval",
-      numberKey: 123,
-      booleanKey: true,
-    },
   };
   if (effect && resource) {
     const policyDocument = {
@@ -55,7 +50,7 @@ const handler = async (event, context, callback) => {
         console.log("Generating policy...");
         const policy = generateAllow(
           "user",
-          `${process.env.LAMBDA_ARN}/dev/POST/*`
+          "*"
         );
         console.log("Successfully generated policy", JSON.stringify(policy));
         callback(null, policy);
