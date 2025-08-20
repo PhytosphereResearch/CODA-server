@@ -126,7 +126,6 @@ module.exports = {
       });
       const auditRecords = await auditController.getAuditRecords(hiId, "hostinteractions or related");
       const dataParse = JSON.parse(JSON.stringify(data));
-   
       response.status(200).json({ ...dataParse, auditRecords });
     }
     catch (err) {
