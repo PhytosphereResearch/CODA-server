@@ -33,8 +33,15 @@ module.exports = {
       })
 
       const auditRecords = await auditController.getAuditRecords(agentId, "agents");
+      
       const dataParse = JSON.parse(JSON.stringify(data));
-      response.status(200).json({ ...dataParse, auditRecords });
+          
+      // const synIds = dataParse.synonyms.map(obj=>obj.id);
+      // console.log(synIds);
+      const synAuditRecords = await auditController.getAuditRecords(dataParse.synonyms.map(obj => obj.id), "synonyms");
+     
+
+      response.status(200).json({ ...dataParse, auditRecords, synAuditRecords });
     }
     catch (err) {
       helper.handleError(response)(err);
