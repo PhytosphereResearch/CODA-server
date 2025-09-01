@@ -3,7 +3,6 @@ const helper = require('./helper');
 const Sequelize = require('sequelize');
 const uniq = require('lodash.uniq');
 const { UPDATE, CREATE } = require('./constants');
-const auditController = require('./auditcontroller');
 
 const { Op } = Sequelize;
 
@@ -210,7 +209,7 @@ module.exports = {
 
       await db.auditLogs.create({//side code to make a record in auditLogs
         user_id: userName,
-        table_name: 'hostinteractions or related',
+        table_name: editedHiTables,
         table_record_id: isUpdate ? hi.id : res.id,
         action: isUpdate ? UPDATE : CREATE,
         new_record: JSON.stringify(rec),
