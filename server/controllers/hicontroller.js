@@ -123,7 +123,7 @@ module.exports = {
         ],
         where: { id: hiId },
       });
-      const auditRecords = await auditController.getAuditRecords(hiId, "editedHiTables");
+      const auditRecords = await auditController.getAuditRecords(hiId, editedHiTables);
       const dataParse = JSON.parse(JSON.stringify(data));
       response.status(200).json({ ...dataParse, auditRecords });
     }
