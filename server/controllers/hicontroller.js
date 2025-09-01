@@ -3,6 +3,7 @@ const helper = require('./helper');
 const Sequelize = require('sequelize');
 const uniq = require('lodash.uniq');
 const { UPDATE, CREATE, editedHiTables } = require('./constants');
+const auditController = require('./auditcontroller');
 
 const { Op } = Sequelize;
 
