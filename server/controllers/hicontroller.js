@@ -4,8 +4,15 @@ const Sequelize = require('sequelize');
 const uniq = require('lodash.uniq');
 const { UPDATE, CREATE, editedHiTables } = require('./constants');
 const auditController = require('./auditcontroller');
-
 const { Op } = Sequelize;
+
+const bufferToString = (buffer) => {
+  if (!buffer || !buffer.data) {
+    return '';
+  }
+  // @ts-expect-error typescript doesn't think uint16 is a number
+  return String.fromCharCode.apply(null, new Uint16Array(buffer.data));
+}
 
 const getDistinct = (colName, colAlias) => db.hiSymptoms.findAll({
   attributes: [
@@ -126,6 +133,11 @@ module.exports = {
       });
       const auditRecords = await auditController.getAuditRecords(hiId, editedHiTables);
       const dataParse = JSON.parse(JSON.stringify(data));
+        
+      await dataParse.agent.synonyms.forEach((synonyms) => {
+        synonyms.notes=bufferToString(synonyms.notes).replace(/ -/g, '\n-');
+      });
+          
       response.status(200).json({ ...dataParse, auditRecords });
     }
     catch (err) {
