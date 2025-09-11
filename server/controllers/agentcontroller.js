@@ -18,7 +18,7 @@ module.exports = {
     const agentId = request.params.agtId;
     try {
       const data = await db.agents.findOne({
-        where: { id: agentId }, 
+        where: { id: agentId },
         include: [
           { model: db.synonyms },
           {
@@ -33,7 +33,6 @@ module.exports = {
       })
 
       const auditRecords = await auditController.getAuditRecords(agentId, "agents");
-      // console.log('AGENT DATA', data)
       const dataParse = JSON.parse(JSON.stringify(data));
       response.status(200).json({ ...dataParse, auditRecords });
     }

@@ -133,11 +133,9 @@ module.exports = {
       });
       const auditRecords = await auditController.getAuditRecords(hiId, editedHiTables);
       const dataParse = JSON.parse(JSON.stringify(data));
-        
       await dataParse.agent.synonyms.forEach((synonyms) => {
         synonyms.notes=bufferToString(synonyms.notes).replace(/ -/g, '\n-');
       });
-          
       response.status(200).json({ ...dataParse, auditRecords });
     }
     catch (err) {
