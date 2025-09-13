@@ -35,8 +35,7 @@ module.exports = {
 
       const auditRecords = await auditController.getAuditRecords(agentId, "agents");
       const dataParse = JSON.parse(JSON.stringify(data));
-      console.log("dataParse", dataParse)
-      await dataParse.synonyms.forEach((synonyms) => {
+      dataParse.synonyms.forEach((synonyms) => {
         synonyms.notes = bufferToString(synonyms.notes).replace(/ -/g, '\n-');
       });
 
