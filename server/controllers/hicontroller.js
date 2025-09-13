@@ -4,7 +4,7 @@ const Sequelize = require('sequelize');
 const uniq = require('lodash.uniq');
 const { UPDATE, CREATE, editedHiTables } = require('./constants');
 const auditController = require('./auditcontroller');
-
+const { bufferToString } = require('../utilities/utils');
 const { Op } = Sequelize;
 
 const getDistinct = (colName, colAlias) => db.hiSymptoms.findAll({
@@ -126,6 +126,9 @@ module.exports = {
       });
       const auditRecords = await auditController.getAuditRecords(hiId, editedHiTables);
       const dataParse = JSON.parse(JSON.stringify(data));
+      dataParse.agent.synonyms.forEach((synonyms) => {
+        synonyms.notes = bufferToString(synonyms.notes).replace(/ -/g, '\n-');
+      });
       response.status(200).json({ ...dataParse, auditRecords });
     }
     catch (err) {

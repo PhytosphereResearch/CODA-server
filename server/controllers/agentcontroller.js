@@ -3,6 +3,7 @@ const Sequelize = require('sequelize');
 const helper = require('./helper');
 const { UPDATE, CREATE } = require('./constants');
 const auditController = require('./auditcontroller');
+const { bufferToString } = require('../utilities/utils');
 
 const getDistinct = (colName, colAlias) => db.agents.findAll({
   attributes: [
@@ -34,6 +35,14 @@ module.exports = {
 
       const auditRecords = await auditController.getAuditRecords(agentId, "agents");
       const dataParse = JSON.parse(JSON.stringify(data));
+      dataParse.synonyms.forEach((synonyms) => {
+        synonyms.notes = bufferToString(synonyms.notes).replace(/ -/g, '\n-');
+      });
+
+      if (dataParse) {
+        dataParse.notes = bufferToString(dataParse.notes).replace(/ -/g, '\n-')
+      };
+
       response.status(200).json({ ...dataParse, auditRecords });
     }
     catch (err) {
