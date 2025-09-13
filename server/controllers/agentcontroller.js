@@ -40,6 +40,8 @@ module.exports = {
         synonyms.notes = bufferToString(synonyms.notes).replace(/ -/g, '\n-');
       });
 
+      {dataParse.notes ? dataParse.notes = bufferToString(dataParse.notes).replace(/ -/g, '\n-') : null};
+      
       response.status(200).json({ ...dataParse, auditRecords });
     }
     catch (err) {
