@@ -1,4 +1,5 @@
 const db = require('../db');
+const { bufferToString } = require('../utilities/utils');
 const { UPDATE, CREATE } = require('./constants');
 const helper = require('./helper');
 
@@ -7,8 +8,11 @@ module.exports = {
   async findAll(request, response) {
     try {
       const data = await db.symptoms.findAll();
-
-      response.status(200).json(data);
+      const dataParse = JSON.parse(JSON.stringify(data));
+      dataParse.forEach((symptom) => {
+        symptom.description = bufferToString(symptom.description);
+      });
+      response.status(200).json(dataParse);
     }
     catch (err) {
       helper.handleError(response)(err);
@@ -24,6 +28,7 @@ module.exports = {
       if (isUpdate) {
         const { id } = symptom;
         const record = await db.symptoms.findOne({ where: { id } })
+        console.log("record", record)
         res = await record.update(symptom)
       } 
       else {
