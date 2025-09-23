@@ -28,7 +28,6 @@ module.exports = {
       if (isUpdate) {
         const { id } = symptom;
         const record = await db.symptoms.findOne({ where: { id } })
-        console.log("record", record)
         res = await record.update(symptom)
       } 
       else {

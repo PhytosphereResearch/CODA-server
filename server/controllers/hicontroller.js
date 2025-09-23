@@ -99,7 +99,6 @@ module.exports = {
           where: plantPartQuery,
         });
         const dataParse = JSON.parse(JSON.stringify(data));
-
         if (dataParse.notes) {
           dataParse.notes = bufferToString(dataParse.notes).replace(/ -/g, '\n-');
         }
@@ -131,16 +130,13 @@ module.exports = {
       });
       const auditRecords = await auditController.getAuditRecords(hiId, editedHiTables);
       const dataParse = JSON.parse(JSON.stringify(data));
-
       dataParse.bibs.forEach((bib) => {
         bib.title = bufferToString(bib.title);
         bib.notes = bufferToString(bib.notes).replace(/ -/g, '\n-');
-      });
- 
+      }); 
       if (dataParse.notes) {
         dataParse.notes = bufferToString(dataParse.notes).replace(/ -/g, '\n-');
       }
-
       dataParse.agent.synonyms.forEach((synonyms) => {
         synonyms.notes = bufferToString(synonyms.notes).replace(/ -/g, '\n-');
       });
