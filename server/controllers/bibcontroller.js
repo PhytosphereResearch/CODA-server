@@ -1,13 +1,19 @@
 const db = require('../db');
 const { UPDATE, CREATE } = require('./constants');
 const helper = require('./helper');
+const { bufferToString } = require('../utilities/utils');
 
 module.exports = {
 
   async findAll(request, response) {
     try {
       const data = await db.bibs.findAll();
-      response.status(200).json(data);
+      const dataParse = JSON.parse(JSON.stringify(data));
+      dataParse.forEach((reference) => {
+        reference.title = bufferToString(reference.title);
+        reference.notes = bufferToString(reference.notes);
+      })  
+      response.status(200).json(dataParse);
     }
     catch (err) {
       helper.handleError(response)(err);

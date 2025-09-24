@@ -1,4 +1,5 @@
 const db = require("../db");
+const { bufferToString } = require("../utilities/utils");
 const { UPDATE, CREATE } = require("./constants");
 const helper = require("./helper");
 
@@ -30,8 +31,12 @@ module.exports = {
   async getOakById(request, response) {
     const id = request.params.id;
     try {
-      const oak = await db.oaks.findOne({ where: { id } });
-      response.status(200).json(oak);
+      let oak = await db.oaks.findOne({ where: { id }, });
+      const dataParse = JSON.parse(JSON.stringify(oak));
+      if (dataParse.notes) {
+        dataParse.notes = bufferToString(dataParse.notes).replace(/ -/g, '\n-')
+      };
+      response.status(200).json(dataParse);
     } catch (err) {
       helper.handleError(response)(err);
     }
