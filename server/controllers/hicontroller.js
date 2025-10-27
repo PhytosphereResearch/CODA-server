@@ -162,7 +162,7 @@ module.exports = {
   async searchByOakAndAgentId(request, response) {
     const { agentId, oakId } = request.query;
     try {
-      await db.hostInteractions.findOne({
+      const data = await db.hostInteractions.findOne({
         include: [
           { model: db.hiSymptoms, include: [{ model: db.symptoms }] },
           { model: db.oaks, where: { id: oakId } },
@@ -177,7 +177,12 @@ module.exports = {
           { model: db.countiesByRegions },
         ],
       })
-        .then(data => response.status(200).json(data))
+      const dataParse = JSON.parse(JSON.stringify(data));
+      if (dataParse.notes) {
+        dataParse.notes = bufferToString(dataParse.notes).replace(/ -/g, '\n-');
+      }
+      response.status(200).json(dataParse);
+      
     }
     catch (err) {
       helper.handleError(response)(err);
