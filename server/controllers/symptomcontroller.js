@@ -8,7 +8,7 @@ module.exports = {
   async findAll(request, response) {
     try {
       const data = await db.symptoms.findAll();
-      const dataParse = await JSON.parse(JSON.stringify(data));
+      const dataParse = JSON.parse(JSON.stringify(data));
       dataParse.forEach((symptom) => {
         symptom.description = bufferToString(symptom.description);
       });
